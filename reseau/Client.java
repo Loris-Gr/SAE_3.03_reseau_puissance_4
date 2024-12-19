@@ -4,30 +4,30 @@ import java.io.*;
 import java.net.InetAddress;
 import java.util.Scanner;
 public class Client {
-    private String IPServeur;
+    private String ipServeur;
     private int portServeur;
-    private String IPClient;
+    private String ipClient;
     private SocketClient socketClient;
     private String pseudo;
     private String message;
 
-    public Client(String IPServeur, int portServeur) throws IOException {
-        this.IPServeur = IPServeur;
+    public Client(String ipServeur, int portServeur) throws IOException {
+        this.ipServeur = ipServeur;
         this.portServeur = portServeur;
-        this.IPClient = InetAddress.getLocalHost().getHostAddress();
-        this.socketClient = new SocketClient(this.portServeur, this.IPServeur);
+        this.ipClient = InetAddress.getLocalHost().getHostAddress();
+        this.socketClient = new SocketClient(this.portServeur, this.ipServeur);
     }
 
-    public String getIPServeur() {
-        return IPServeur;
+    public String getIpServeur() {
+        return ipServeur;
     }
 
     public int getPortServeur() {
         return portServeur;
     }
 
-    public String getIPClient() {
-        return IPClient;
+    public String getIpClient() {
+        return ipClient;
     }
 
     public SocketClient getSocketClient() {
@@ -42,25 +42,26 @@ public class Client {
         return pseudo;
     }
 
-    public static void main(String[] args) {
+    public void lancement() {
         boolean continuer = true;
         Scanner scanner = new Scanner(System.in);
         String s;
+        this.socketClient.start();
             while (continuer) {
                 System.out.println("Quel message ? ");
                 s = scanner.nextLine();
                 String[] messages = s.split(" "); // Avec split de sépare le message en deux grâce aux espaces
                 if (messages[0].equals("connect")) {
-                    
+                    this.socketClient.envoyerCommande("connect "+ messages[1] + " " + this.ipClient);
                 }
                 else if (messages[0].equals("ask")) {
-                    
+                    this.socketClient.envoyerCommande("ask "+ messages[1]);
                 }
                 else if (messages[0].equals("play")) {
-                    
+                    this.socketClient.envoyerCommande("play "+ messages[1]);
                 }
-
                 else if (s.equals("quit")) {
+                    this.socketClient.envoyerCommande("quit " + this.ipClient);
                     continuer = false; 
                 }
                 else {
