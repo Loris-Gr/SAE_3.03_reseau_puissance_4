@@ -39,7 +39,7 @@ public class SocketClient extends Thread {
     public void run() {
         try {
             while (true) {
-                String message = reader.readLine();
+                String message = this.reader.readLine();
                 System.out.println(message);
             }
         } 

@@ -22,8 +22,8 @@ public class ClientHandler implements Runnable {
     }
 
     public void envoyerMessage(String message) {
-        writer.println(message);
-        writer.flush();
+        this.writer.println(message);
+        this.writer.flush();
     }
 
     public void run(){
@@ -38,32 +38,32 @@ public class ClientHandler implements Runnable {
                 if (messages[0].equals("connect")) {
                     boolean etat = serveur.connecterClient(messages[1], messages[2]);
                     if (etat) {
-                        envoyerMessage("Client" + messages[1] + "connecté");
+                        this.envoyerMessage("Client " + messages[1] + " connecté");
                     }
                     else {
-                        envoyerMessage("Client déjà connecté");
+                        this.envoyerMessage("Client déjà connecté");
                     }
                 }
                 else if (messages[0].equals("ask")) {
-                    envoyerMessage("Recherche du joueur" + messages[1]);
+                    this.envoyerMessage("Recherche du joueur " + messages[1]);
                     
                 }
                 else if (messages[0].equals("play")) {
-                    envoyerMessage("Bientôt");
+                    this.envoyerMessage("Bientôt");
                     
                 }
-                else if (messages[0].equals("disconnect")) {
-                    boolean etat = serveur.deconnecterClient(messages[1], messages[2]);
+                else if (messages[0].equals("quit")) {
+                    boolean etat = serveur.deconnecterClient(messages[1]);
                     if (etat) {
-                        envoyerMessage("Client" + messages[1] + "déconnecté");
+                        this.envoyerMessage("Client " + messages[1] + " déconnecté");
+                        System.out.println("Client " + messages[1] + " déconnecté");
                     }
                     else {
-                        envoyerMessage("Client non connecté");
+                        this.envoyerMessage("Client non connecté");
                     }
                 }
-
                 else {
-                    envoyerMessage("Commande inconnue");
+                    this.envoyerMessage("Commande inconnue");
                 }
             }
             reader.close();

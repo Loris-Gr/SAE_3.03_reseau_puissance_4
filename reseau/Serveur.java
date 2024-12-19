@@ -37,9 +37,9 @@ public class Serveur {
         return true;
     }
 
-    public boolean deconnecterClient(String pseudo, String ipClient) {
+    public boolean deconnecterClient(String ipClient) {
         for (JoueurServeur joueur : this.joueursConnectes) {
-            if (joueur.getPseudo().equals(pseudo) && joueur.getIpJoueur().equals(ipClient)) {
+            if (joueur.getIpJoueur().equals(ipClient)) {
                 this.joueursConnectes.remove(joueur);
                 return true;
             }
