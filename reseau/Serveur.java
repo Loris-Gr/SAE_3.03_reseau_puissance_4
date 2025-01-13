@@ -38,6 +38,14 @@ public class Serveur {
         return portServeur;
     }
 
+    public String getStringClientConnectes() {
+        String pseudos = "";
+        for (JoueurServeur joueur : this.joueursConnectes) {
+            pseudos += joueur.getPseudo() + "\n";
+        }
+        return pseudos;
+    }
+
     public boolean clientConnecte(String pseudo, String ipClient) {
         return this.joueursConnectes.contains(new JoueurServeur(pseudo, ipClient));
     }

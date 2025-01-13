@@ -46,6 +46,12 @@ public class ClientHandler implements Runnable {
                         this.envoyerMessage("ERR, " + retour);
                     }
                 }
+
+                else if (messages[0].equals("players")) {
+                    message = this.serveur.getStringClientConnectes();
+                    this.envoyerMessage(message);
+                }
+
                 else if (messages[0].equals("ask")) {
                     this.envoyerMessage("Recherche du joueur " + messages[1]);
                     

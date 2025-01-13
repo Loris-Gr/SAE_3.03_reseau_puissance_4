@@ -63,6 +63,12 @@ public class Client {
                         System.out.println("Erreur : " + reponse);
                     }
                 }
+                else if (messages[0].equals("players")) {
+                    this.socketClient.envoyerCommande("players");
+                    String reponse = this.socketClient.lireReponse();
+                    System.out.println("Liste des autres joueurs : " +reponse);
+                }
+
                 else if (messages[0].equals("ask")) {
                     this.socketClient.envoyerCommande("ask "+ messages[1]);
                 }
