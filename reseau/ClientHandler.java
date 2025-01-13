@@ -36,12 +36,14 @@ public class ClientHandler implements Runnable {
                 message = reader.readLine();
                 String[] messages = message.split(" "); // Avec split de sépare le message en deux grâce aux espaces
                 if (messages[0].equals("connect")) {
-                    boolean etat = serveur.connecterClient(messages[1], messages[2]);
+                    Serveur.TupleRetour tupleRetour = serveur.connecterClient(messages[1], messages[2]);
+                    boolean etat = tupleRetour.estValide();
+                    String retour = tupleRetour.getMessage(); 
                     if (etat) {
-                        this.envoyerMessage("Client " + messages[1] + " connecté");
+                        this.envoyerMessage("OK");
                     }
                     else {
-                        this.envoyerMessage("Client déjà connecté");
+                        this.envoyerMessage("ERR, " + retour);
                     }
                 }
                 else if (messages[0].equals("ask")) {

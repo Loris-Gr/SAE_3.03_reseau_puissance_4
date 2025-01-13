@@ -16,6 +16,24 @@ public class Serveur {
         this.socketServer.start();
     }
 
+    public static class TupleRetour {
+        private boolean estValide;
+        private String message;
+
+        public TupleRetour(boolean estValide, String message) {
+            this.estValide = estValide;
+            this.message = message;
+        }
+
+        public boolean estValide() {
+            return estValide;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
     public int getPortServeur() {
         return portServeur;
     }
@@ -24,17 +42,40 @@ public class Serveur {
         return this.joueursConnectes.contains(new JoueurServeur(pseudo, ipClient));
     }
 
-    public boolean connecterClient(String pseudo, String ipClient) {
+    public TupleRetour connecterClient(String pseudo, String ipClient) {
+        String message = "";
+        boolean erreurPseudo = false;
+        if (pseudo.length() < 3 ) {
+            message+="Pseudo trop court";
+            erreurPseudo = true;
+        }
+        if (pseudo.length() > 10 ) {
+            message+="Pseudo trop long";
+            erreurPseudo = true;
+        }
+        if (pseudo.contains(" ")) {
+            if (message.equals("")) {
+                message+="Il ne faut pas d'espace dans le pseudo";
+                erreurPseudo = true;
+            }
+            else {
+                message+= " et il ne faut pas d'espace dans le pseudo";
+            }
+        }
+        if (erreurPseudo) {
+            return new TupleRetour(false, message);
+        }
+
         if (this.clientConnecte(pseudo, ipClient)) {
-            return false;
+            return new TupleRetour(false, "Client déjà connecté");
         }
         for (JoueurServeur joueur : this.joueursConnectes) {
             if (joueur.getPseudo().equals(pseudo)) {
-                return false;
+                return new TupleRetour(false, "Pseudo déjà utilisé");
             }
         }
         this.joueursConnectes.add(new JoueurServeur(pseudo, ipClient));
-        return true;
+        return new TupleRetour(true, "OK");
     }
 
     public boolean deconnecterClient(String ipClient) {

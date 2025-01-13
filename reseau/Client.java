@@ -46,6 +46,7 @@ public class Client {
         boolean continuer = true;
         Scanner scanner = new Scanner(System.in);
         String s;
+        boolean connecte = false;
         this.socketClient.start();
             while (continuer) {
                 System.out.println("Quel message ? ");
@@ -53,6 +54,14 @@ public class Client {
                 String[] messages = s.split(" "); // Avec split de sépare le message en deux grâce aux espaces
                 if (messages[0].equals("connect")) {
                     this.socketClient.envoyerCommande("connect "+ messages[1] + " " + this.ipClient);
+                    String reponse = this.socketClient.lireReponse();
+                    if (reponse.equals("OK")) {
+                        System.out.println("Connexion réussie !");
+                        connecte = true;
+                    }
+                    else {
+                        System.out.println("Erreur : " + reponse);
+                    }
                 }
                 else if (messages[0].equals("ask")) {
                     this.socketClient.envoyerCommande("ask "+ messages[1]);
