@@ -19,7 +19,7 @@ public class SocketServeur extends Thread{
                 Socket socketClient = socketServeur.accept();
                 Thread t = new Thread(new ClientHandler(socketClient, this.serveur));
                 t.start();
-                System.out.println("connexion d'un client");
+                System.out.println("connexion d'un client : \n");
             }
         }
         catch (IOException e) {
