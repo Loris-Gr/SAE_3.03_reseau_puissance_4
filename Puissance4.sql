@@ -1,22 +1,20 @@
-IF EXISTS DROP TABLE PARTIE;
-IF EXISTS DROP TABLE EQUIPE;
-
+DROP TABLE IF EXISTS PARTIE;
+DROP TABLE IF EXISTS EQUIPE;
 
 CREATE TABLE EQUIPE (
     idEqu INT PRIMARY KEY,
-    nomEqu VARCHAR(50) UNIQUE NOT NULL,
-    couleurEqu CHAR(1) NOT NULL,
+    symbole VARCHAR(50) UNIQUE NOT NULL,
     scoreEqu INT DEFAULT 0
 );
 
-INSERT INTO Equipe (id, nom, symbole) VALUES
-(0, 'AUCUNE', ' '),
-(1, 'JAUNE', 'J'),
-(2, 'ROUGE', 'R');
+INSERT INTO EQUIPE (idEqu, symbole) VALUES
+(0, ' '),
+(1, 'J'),
+(2, 'R');
 
 CREATE TABLE PARTIE (
     idPart INT PRIMARY KEY,
     datePart DATE NOT NULL,
     idEquGagn INT,
-    FOREIGN KEY (idEquGagn) REFERENCES Equipe(idEqu)
+    FOREIGN KEY (idEquGagn) REFERENCES EQUIPE(idEqu)
 );

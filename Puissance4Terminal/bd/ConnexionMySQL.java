@@ -1,5 +1,6 @@
-package BD;
+package Puissance4Terminal.bd;
 import java.sql.*;
+
 
 public class ConnexionMySQL {
     private Connection mysql;
@@ -50,3 +51,4 @@ public class ConnexionMySQL {
         return this.mysql;
     }
 }
+

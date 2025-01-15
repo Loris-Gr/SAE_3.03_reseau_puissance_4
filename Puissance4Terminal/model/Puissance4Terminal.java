@@ -1,11 +1,27 @@
 package Puissance4Terminal.model;
 
+import java.sql.Date;
+import java.sql.SQLException;
 import java.util.Scanner;
+
+import Puissance4Terminal.bd.ConnexionMySQL;
+import Puissance4Terminal.bd.EquipeBD;
+import Puissance4Terminal.bd.PartieBD;
 
 public class Puissance4Terminal {
     public static void main(String[] args) {
         ModeleJeu modele = new ModeleJeu(Equipe.JAUNE);
         Scanner scanner = new Scanner(System.in);
+
+        ConnexionMySQL connexion;
+        try {
+            connexion = new ConnexionMySQL();
+            connexion.connecter("servinfo-maria", "DBvergerolle", "vergerolle", "vergerolle");
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+        EquipeBD equipeBD = new EquipeBD(connexion);
 
         while (true) {
             // Affichage de la grille et instructions pour le joueur
@@ -31,6 +47,12 @@ public class Puissance4Terminal {
             if (modele.estGagnee()) {
                 modele.getGrille().afficher();
                 System.out.println("Le joueur " + modele.getJoueur() + " a gagné !");
+                try {
+                    PartieBD partieBD = new PartieBD(connexion);
+                    partieBD.enregistrerPartie(modele.getJoueur().getId(), new Date(System.currentTimeMillis())); // Enregistrement de la partie
+                } catch (SQLException e) {
+                    System.err.println("Erreur lors de l'enregistrement de la partie : " + e.getMessage());
+                }
                 break;
             }
 
