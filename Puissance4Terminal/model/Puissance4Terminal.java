@@ -1,4 +1,4 @@
-package Puissance4Terminal;
+package Puissance4Terminal.model;
 
 import java.util.Scanner;
 

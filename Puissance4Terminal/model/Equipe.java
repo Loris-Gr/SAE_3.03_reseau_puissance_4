@@ -1,4 +1,4 @@
-package Puissance4Terminal;
+package Puissance4Terminal.model;
 
 public enum Equipe {
     AUCUNE(0, " "),

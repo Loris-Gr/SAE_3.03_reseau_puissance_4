@@ -1,4 +1,4 @@
-package Puissance4Terminal;
+package Puissance4Terminal.model;
 
 public class Grille {
     private final Equipe[][] grille; // Grille de jeu
