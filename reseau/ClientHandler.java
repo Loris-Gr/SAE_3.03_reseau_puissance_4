@@ -74,20 +74,21 @@ public class ClientHandler implements Runnable {
                 }
 
                 else if (messages[0].equals("duel")) {
-                    if (messages[1].equals("n")) {
-                        this.envoyerMessage("refuse");
-                    }
+                    ClientHandler adversaire = serveur.getHandler(messages[2]);
                     if (messages[1].equals("y")) {
-                        ClientHandler adversaireHandler = serveur.getHandler(messages[2]);
-                        adversaireHandler.envoyerMessage("accepte");
-                        serveur.lancerPartie(this, adversaireHandler);
+                        adversaire.envoyerMessage("accepte");
+                        serveur.lancerPartie(adversaire, this);
+                    } else if (messages[1].equals("n")) {
+                        adversaire.envoyerMessage("refuse");
                     }
                 }
 
                 else if (messages[0].equals("play")) {
                     Partie maPartie = trouverMaPartie(this);
-                    int colonne = Integer.parseInt(messages[1]);
-                    maPartie.jouerColonne(this, colonne);
+                        if (maPartie != null) {
+                            int colonne = Integer.parseInt(messages[1]);
+                            maPartie.jouerColonne(this, colonne);
+                        }
                     
                 }
                 else if (messages[0].equals("quit")) {

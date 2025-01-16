@@ -2,9 +2,9 @@ package reseau;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Serveur {
     private int portServeur;
     private SocketServeur socketServer;
@@ -16,6 +16,7 @@ public class Serveur {
         this.portServeur = portServeur;
         this.joueursConnectes = new ArrayList<>();
         this.clientHandlers = new ArrayList<>();
+        this.parties = new ArrayList<>();
         this.socketServer = new SocketServeur(portServeur, this);
         this.socketServer.start();
     }
@@ -120,10 +121,6 @@ public class Serveur {
     public void lancerPartie(ClientHandler joueur1, ClientHandler joueur2) {
         Partie partie = new Partie(joueur1, joueur2);
         this.parties.add(partie);
-        partie.envoyerGrille();
-
-        joueur1.envoyerMessage("La partie commence ! Vous jouez avec les pions JAUNES.");
-        joueur2.envoyerMessage("La partie commence ! Vous jouez avec les pions ROUGES.");
     }
 
 

@@ -110,8 +110,7 @@ public class Client {
         boolean connecte = false;
         this.socketClient.start();
             while (continuer) {
-                if (connecte) {
-                    if (nouveauMessage) {
+                if (connecte && nouveauMessage) {
                         String[] messages = this.message.split(" ");
                         if (messages[0].split("\n")[0].equals("duel")) {
                             System.out.println(messages[1].split("\n")[0] + " vous défi en duel, acceptez-vous ? (y/n)");
@@ -123,9 +122,9 @@ public class Client {
                                 this.socketClient.envoyerCommande("duel "+s+ " " + this.pseudo);
                                 lancerPartie();
                             }
+                            nouveauMessage = false;
+                            continue;
                             }
-
-                        }
                     }
                 System.out.println("Quel message ? ");
                 s = scanner.nextLine();
@@ -152,6 +151,7 @@ public class Client {
                         this.socketClient.envoyerCommande("ask "+ messages[1]);
                         attendreMessage();
                         if (this.message.split("\n")[0].equals("accepte")) {
+                            System.out.println("Le joueur a accepté le duel !");
                             lancerPartie();
                         }
                         else if (this.message.split("\n")[0].equals("refuse")) {
