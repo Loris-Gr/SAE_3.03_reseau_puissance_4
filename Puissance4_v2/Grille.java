@@ -57,7 +57,7 @@ public class Grille {
     /**
      * Affiche la grille de jeu
      */
-    public void afficher2() {
+    public void afficher() {
         for (int i = 0; i < grille.length; i++) {
             for (int j = 0; j < grille[i].length; j++) {
                 System.out.print("| " + grille[i][j] + " ");
@@ -74,7 +74,7 @@ public class Grille {
     /**
      * Affiche la grille de jeu
      */
-    public String afficher() {
+    public String afficher2() {
         StringBuilder res = new StringBuilder();
         
         // Affichage de la grille

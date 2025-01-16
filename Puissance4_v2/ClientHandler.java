@@ -121,8 +121,8 @@ public class ClientHandler extends Thread {
                 while (this.adversaire != null && this.duelAccepte) {
                     Scanner scanner = new Scanner(this.in);
                     // Affichage de la grille et instructions pour le joueur
-                    this.out.println(this.modele.getGrille().afficher());
-                    this.adversaire.out.println(this.modele.getGrille().afficher());
+                    this.out.println(this.modele.getGrille().afficher2());
+                    this.adversaire.out.println(this.modele.getGrille().afficher2());
 
                     this.out.println("Joueur " + modele.getJoueur() + ", choisissez une colonne (0-6) :");
                     this.adversaire.out.println("Joueur " + modele.getJoueur() + ", choisissez une colonne (0-6) :");

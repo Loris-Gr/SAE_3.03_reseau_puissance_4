@@ -1,9 +1,28 @@
 import java.util.Scanner;
 
+import bd.PartieBD;
+import bd.ConnexionMySQL;
+
 public class Puissance4Terminal {
     public static void main(String[] args) {
         ModeleJeu modele = new ModeleJeu(Equipe.JAUNE);
         Scanner scanner = new Scanner(System.in);
+        ConnexionMySQL connexion = null;
+
+        try {
+            connexion = new ConnexionMySQL();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.exit(1); // Exit the program if the class is not found
+        }
+        try {
+            connexion.connecter("servinfo-maria", "DBvergerolle", "vergerolle", "vergerolle");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        PartieBD partieBD = new PartieBD(connexion);
+
 
         while (true) {
             // Affichage de la grille et instructions pour le joueur
@@ -42,6 +61,23 @@ public class Puissance4Terminal {
             // Changement de joueur
             modele.changerJoueur();
         }
+
+        try {
+            partieBD.enregistrerPartie(modele.getJoueur().getId(), new java.sql.Date(System.currentTimeMillis()));
+            int score = partieBD.getScore(modele.getJoueur().getSymbole()) + 1;
+            partieBD.setScore(modele.getJoueur().getSymbole(), score);
+
+            int scoreEquipeJaune = partieBD.getScore(Equipe.JAUNE.getSymbole());    
+            int scoreEquipeRouge = partieBD.getScore(Equipe.ROUGE.getSymbole());
+            System.out.println("Score de l'équipe " + Equipe.JAUNE + " : " + scoreEquipeJaune);
+            System.out.println("Score de l'équipe " + Equipe.ROUGE + " : " + scoreEquipeRouge);
+            
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
 
         scanner.close();
     }
