@@ -15,8 +15,8 @@ public class EquipeBD {
         this.laConnexionMySQL = laConnexionMySQL;
     }
 
-    public int getScore(Equipe equipe) throws SQLException {
-        String query = "SELECT (score) AS score FROM EQUIPE WHERE symbole = '" + equipe.getSymbole() + "'";
+    public int getScore(String nomEqu) throws SQLException {
+        String query = "SELECT (score) AS score FROM EQUIPE WHERE symbole = '" + nomEqu + "'";
         Statement stm = this.laConnexionMySQL.createStatement();
         ResultSet rs = stm.executeQuery(query);
         int score = 0;

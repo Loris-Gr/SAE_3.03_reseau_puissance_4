@@ -21,7 +21,15 @@ public class Puissance4Terminal {
             e.printStackTrace();
             return;
         }
+
+
         EquipeBD equipeBD = new EquipeBD(connexion);
+        PartieBD partieBD = new PartieBD(connexion);
+        try {
+            partieBD.restorerPartieBD();
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la restauration de la partie : " + e.getMessage());
+        }
 
         while (true) {
             // Affichage de la grille et instructions pour le joueur
@@ -48,8 +56,8 @@ public class Puissance4Terminal {
                 modele.getGrille().afficher();
                 System.out.println("Le joueur " + modele.getJoueur() + " a gagné !");
                 try {
-                    PartieBD partieBD = new PartieBD(connexion);
                     partieBD.enregistrerPartie(modele.getJoueur().getId(), new Date(System.currentTimeMillis())); // Enregistrement de la partie
+                    System.out.println("Partie enregistrée !");
                 } catch (SQLException e) {
                     System.err.println("Erreur lors de l'enregistrement de la partie : " + e.getMessage());
                 }
@@ -65,8 +73,14 @@ public class Puissance4Terminal {
 
             // Changement de joueur
             modele.changerJoueur();
+
         }
 
         scanner.close();
+        try {
+            System.out.println( equipeBD.getScore("J")); 
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération du score : " + e.getMessage());
+        }
     }
 }

@@ -13,8 +13,7 @@ public class ExecutableBD {
             if (connexion.isConnecte()) {
                 Puissance4BD bd = new Puissance4BD(connexion);
                 EquipeBD equipeBD = new EquipeBD(connexion);
-                
-               
+                System.out.println("Connexion établie.");
             } else {
                 System.err.println("Erreur: Connection non établie.");
             }
@@ -22,5 +21,6 @@ public class ExecutableBD {
             System.err.println("Erreur: " + e.getMessage());
             e.printStackTrace();
         }
+
     }
 }
