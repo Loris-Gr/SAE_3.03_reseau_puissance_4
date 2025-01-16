@@ -23,41 +23,34 @@ public class Partie {
     }
 
     public void envoyerGrille() {
-        String grille = this.puissance4.getGrille().getStringGrille();
-        this.joueur1.envoyerMessage(grille);
-        this.joueur2.envoyerMessage(grille);
+        String grille = puissance4.getGrille().getStringGrille();
+        joueur1.envoyerMessage("Grille :\n" + grille);
+        joueur2.envoyerMessage("Grille :\n" + grille);
     }
 
     public void jouerColonne(ClientHandler joueur, int numColonne) {
-        // Tentative de déposer le pion
-        if (!this.puissance4.getGrille().poserPion(numColonne, this.puissance4.getJoueur())) {
+        if (!puissance4.getGrille().poserPion(numColonne, puissance4.getJoueur())) {
             joueur.envoyerMessage("Colonne pleine, choisissez une autre.");
+            return;
         }
+
         envoyerGrille();
 
-        // Vérification de victoire
-        if (this.puissance4.estGagnee()) {
-            if (joueur == joueur1) {
-                this.joueur2.envoyerMessage("lose");
-            }
-            else { // si joueur 2 a gagné
-                this.joueur1.envoyerMessage("lose");
-            }
+        if (puissance4.estGagnee()) {
             joueur.envoyerMessage("win");
-            
+            (joueur == joueur1 ? joueur2 : joueur1).envoyerMessage("lose");
+            return;
         }
 
-        // Vérification de match nul
-        if (this.puissance4.estPerdu()) {
-            this.joueur1.envoyerMessage("nul");
-            this.joueur2.envoyerMessage("nul");
+        if (puissance4.estPerdu()) {
+            joueur1.envoyerMessage("nul");
+            joueur2.envoyerMessage("nul");
+            return;
         }
 
-        // Changement de joueur
-        this.puissance4.changerJoueur();
+        puissance4.changerJoueur();
+        ClientHandler joueurActif = puissance4.getJoueur() == Equipe.JAUNE ? joueur1 : joueur2;
+        joueurActif.envoyerMessage("play");
+        (joueurActif == joueur1 ? joueur2 : joueur1).envoyerMessage("wait");
     }
-    
-
-
-    
 }

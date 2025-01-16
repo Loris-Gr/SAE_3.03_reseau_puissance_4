@@ -13,7 +13,6 @@ public class Client {
     private boolean nouveauMessage;
     private final Object lock = new Object();
     private boolean partieEnCours;
-    private boolean monTour;
 
     public Client(String ipServeur, int portServeur) throws IOException {
         this.ipServeur = ipServeur;
@@ -22,7 +21,6 @@ public class Client {
         this.socketClient = new SocketClient(this, this.portServeur, this.ipServeur);
         this.nouveauMessage = false;
         this.partieEnCours = false;
-        this.monTour = false;
     }
 
     public String getIpServeur() {
@@ -65,9 +63,18 @@ public class Client {
     public void setPartieEnCours(boolean partieEnCours) {
         this.partieEnCours = partieEnCours;
     }
-    
-    public void setMonTour(boolean monTour) {
-        this.monTour = monTour;
+
+    private void attendreMessage() {
+        synchronized (lock) {
+            while (!nouveauMessage) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            nouveauMessage = false;
+        }
     }
 
     private void lancerPartie() {
@@ -75,17 +82,13 @@ public class Client {
         String s;
         this.partieEnCours = true;
             while (this.partieEnCours) {
-                synchronized (lock) {
-                    while (!nouveauMessage) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    attendreMessage();
                     System.out.println(this.message);
-                    this.nouveauMessage = false;
-                    if (this.monTour) {
+                    if (this.message.split("\n")[0].equals("win") || this.message.split("\n")[0].equals("lose") || this.message.split("\n")[0].equals("nul")) {
+                        this.partieEnCours = false;
+                        System.out.println("Fin de la partie : " + this.message);
+                    }
+                    else if (this.message.split("\n")[0].equals("play")) {
                         System.out.println("Entrez le numéro de colonne 1;2;3;4;5;6");
                         s = scanner.nextLine();
                         while (!s.matches("[1-6]")) {
@@ -94,12 +97,11 @@ public class Client {
                         }
                         this.socketClient.envoyerCommande("play " + s);
                     }
-                    else {
-                        System.out.println("En attente de l'action de l'autre joueur");
+                    else if (this.message.equals("wait")) {
+                        System.out.println("En attente de l'action de l'autre joueur...");
                     }
-                }
             }
-    }
+        }
 
     public void lancement() {
         boolean continuer = true;
@@ -108,7 +110,6 @@ public class Client {
         boolean connecte = false;
         this.socketClient.start();
             while (continuer) {
-                System.out.println(this.message);
                 if (connecte) {
                     if (nouveauMessage) {
                         String[] messages = this.message.split(" ");
@@ -130,16 +131,8 @@ public class Client {
                 s = scanner.nextLine();
                 String[] messages = s.split(" "); // Avec split de sépare le message en deux grâce aux espaces
                 if (messages[0].equals("connect")) {
-                    synchronized (lock) {
                     this.socketClient.envoyerCommande("connect "+ messages[1] + " " + this.ipClient);
-                    while (!nouveauMessage) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                    attendreMessage();
                     if (this.message.split("\n")[0].equals("OK")) {
                         System.out.println("Connexion réussie !");
                         connecte = true;
@@ -148,43 +141,22 @@ public class Client {
                     else {
                         System.out.println("Erreur : " + this.message);
                     }
-                    this.nouveauMessage = false;
-                    
                 }
                 else if (messages[0].equals("players")) {
-                    synchronized (lock) {   
                     this.socketClient.envoyerCommande("players");
-                    while (!nouveauMessage) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    attendreMessage();
                     System.out.println("Liste des autres joueurs : " +this.message);
                 }
-                this.nouveauMessage = false;
-            }
 
                 else if (messages[0].equals("ask")) {
-                    synchronized (lock) {
                         this.socketClient.envoyerCommande("ask "+ messages[1]);
-                        while (!nouveauMessage) {
-                            try {
-                                lock.wait();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        attendreMessage();
                         if (this.message.split("\n")[0].equals("accepte")) {
                             lancerPartie();
                         }
                         else if (this.message.split("\n")[0].equals("refuse")) {
                             System.out.println("Le joueur n'a pas accepté le duel :(");
                         }
-                    }
-                    this.nouveauMessage = false;
-                }
                 else if (s.equals("quit")) {
                     this.socketClient.envoyerCommande("quit " + this.ipClient);
                     continuer = false; 
@@ -192,7 +164,8 @@ public class Client {
                 else {
                     System.out.println("Erreur, commande inconnue");
                 }
-            }
-            scanner.close();
-    }        
+            }    
+        }        
+    scanner.close();
+}
 }
