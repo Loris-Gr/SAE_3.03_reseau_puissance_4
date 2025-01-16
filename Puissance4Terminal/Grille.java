@@ -66,10 +66,23 @@ public class Grille {
             }
             System.out.println("|");
         }
-        System.out.println("-".repeat(grille[0].length * 4 + 1));
         for (int i = 0; i < grille[0].length; i++) {
             System.out.print("  " + i + " ");
         }
         System.out.println();
+    }
+
+    public String getStringGrille() {
+        String message = "";
+        for (int i = 0; i < grille.length; i++) {
+            for (int j = 0; j < grille[i].length; j++) {
+                message+="| " + grille[i][j] + " ";
+            }
+            message+="|\n";
+        }
+        for (int i = 0; i < grille[0].length; i++) {
+            message+="  " + i + " ";
+        }
+        return message;
     }
 }

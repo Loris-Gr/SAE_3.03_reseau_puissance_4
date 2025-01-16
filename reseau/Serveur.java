@@ -2,16 +2,20 @@ package reseau;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 public class Serveur {
     private int portServeur;
     private SocketServeur socketServer;
     private List<JoueurServeur> joueursConnectes;
+    private List<ClientHandler> clientHandlers;
+    private List<Partie> parties;
 
     public Serveur(int portServeur) throws IOException {
         this.portServeur = portServeur;
         this.joueursConnectes = new ArrayList<>();
+        this.clientHandlers = new ArrayList<>();
         this.socketServer = new SocketServeur(portServeur, this);
         this.socketServer.start();
     }
@@ -36,6 +40,10 @@ public class Serveur {
 
     public int getPortServeur() {
         return portServeur;
+    }
+
+    public List<Partie> getParties() {
+        return parties;
     }
 
     public String getStringClientConnectes() {
@@ -96,20 +104,38 @@ public class Serveur {
         return false;
     }
 
-    public static void main(String[] args) {
+    public ClientHandler getHandler(String pseudo) {
+        for (ClientHandler handler : clientHandlers) {
+            if (handler.getPseudo().equals(pseudo)) {
+                return handler;
+            }
+        }
+        return null;
+    }
+
+    public void lancerPartie(ClientHandler joueur1, ClientHandler joueur2) {
+        Partie partie = new Partie(joueur1, joueur2);
+        this.parties.add(partie);
+        partie.envoyerGrille();
+
+        joueur1.envoyerMessage("La partie commence ! Vous jouez avec les pions JAUNES.");
+        joueur2.envoyerMessage("La partie commence ! Vous jouez avec les pions ROUGES.");
+    }
+
+
+    public void start() throws IOException {
+        ServerSocket socketServer = new ServerSocket(4444);
         while (true) {
-            try {
-                ServerSocket socketServer = new ServerSocket(4444);
-                //Socket socketClient = socketServer.accept();
-                Thread t = new Thread(new ConnexionServeur(socketServer));
-                t.start();
+                Socket socketClient = socketServer.accept();
+                ClientHandler clientHandler = new ClientHandler(socketClient, this);
+                Thread clientThread = new Thread(clientHandler);
+                clientThread.start();
+                synchronized (this.clientHandlers) {
+                    this.clientHandlers.add(clientHandler);
+                }
                 System.out.println("connexion d'un client");
-                //socketClient.close();
+                socketClient.close();
                 socketServer.close();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

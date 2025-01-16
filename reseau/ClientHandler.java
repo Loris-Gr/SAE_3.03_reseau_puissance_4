@@ -12,6 +12,7 @@ public class ClientHandler implements Runnable {
     private InputStreamReader stream;
     private BufferedReader reader;
     private Serveur serveur;
+    private String pseudo;
 
     public ClientHandler(Socket socket, Serveur serveur) throws IOException{
         this.socket = socket;
@@ -24,6 +25,19 @@ public class ClientHandler implements Runnable {
     public void envoyerMessage(String message) {
         this.writer.println(message);
         this.writer.flush();
+    }
+
+    public String getPseudo() {
+        return this.pseudo;
+    }
+
+    public Partie trouverMaPartie(ClientHandler joueur) {
+        for (Partie partie : serveur.getParties()) {
+            if (partie.getJoueur1().equals(joueur) || partie.getJoueur2().equals(joueur)) {
+                return partie;
+            }
+        }
+        return null;
     }
 
     public void run(){
@@ -41,6 +55,7 @@ public class ClientHandler implements Runnable {
                     String retour = tupleRetour.getMessage(); 
                     if (etat) {
                         this.envoyerMessage("OK");
+                        this.pseudo = messages[1];
                     }
                     else {
                         this.envoyerMessage("ERR, " + retour);
@@ -53,11 +68,26 @@ public class ClientHandler implements Runnable {
                 }
 
                 else if (messages[0].equals("ask")) {
-                    this.envoyerMessage("Recherche du joueur " + messages[1]);
+                    ClientHandler adversaireHandler = serveur.getHandler(messages[1]);
+                    adversaireHandler.envoyerMessage("duel "+this.pseudo);
                     
                 }
+
+                else if (messages[0].equals("duel")) {
+                    if (messages[1].equals("n")) {
+                        this.envoyerMessage("refuse");
+                    }
+                    if (messages[1].equals("y")) {
+                        ClientHandler adversaireHandler = serveur.getHandler(messages[2]);
+                        this.envoyerMessage("accepte");
+                        serveur.lancerPartie(this, adversaireHandler);
+                    }
+                }
+
                 else if (messages[0].equals("play")) {
-                    this.envoyerMessage("Bientôt");
+                    Partie maPartie = trouverMaPartie(this);
+                    int colonne = Integer.parseInt(messages[1]);
+                    maPartie.jouerColonne(this, colonne);
                     
                 }
                 else if (messages[0].equals("quit")) {

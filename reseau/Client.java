@@ -12,6 +12,8 @@ public class Client {
     private String message;
     private boolean nouveauMessage;
     private final Object lock = new Object();
+    private boolean partieEnCours;
+    private boolean monTour;
 
     public Client(String ipServeur, int portServeur) throws IOException {
         this.ipServeur = ipServeur;
@@ -19,6 +21,8 @@ public class Client {
         this.ipClient = InetAddress.getLocalHost().getHostAddress();
         this.socketClient = new SocketClient(this, this.portServeur, this.ipServeur);
         this.nouveauMessage = false;
+        this.partieEnCours = false;
+        this.monTour = false;
     }
 
     public String getIpServeur() {
@@ -58,6 +62,46 @@ public class Client {
         }
     }
 
+    public void setPartieEnCours(boolean partieEnCours) {
+        this.partieEnCours = partieEnCours;
+    }
+    
+    public void setMonTour(boolean monTour) {
+        this.monTour = monTour;
+    }
+
+    private void lancerPartie() {
+        Scanner scanner = new Scanner(System.in);
+        String s;
+        this.partieEnCours = true;
+        this.nouveauMessage = false;
+            while (this.partieEnCours) {
+                synchronized (lock) {
+                    while (!nouveauMessage) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    System.out.println(this.message);
+                    this.nouveauMessage = false;
+                    if (this.monTour) {
+                        System.out.println("Entrez le numéro de colonne 1;2;3;4;5;6");
+                        s = scanner.nextLine();
+                        while (!s.matches("[1-6]")) {
+                            System.out.println("Numéro invalide. Entrez le numéro de colonne 1;2;3;4;5;6");
+                            s = scanner.nextLine();
+                        }
+                        this.socketClient.envoyerCommande("play " + s);
+                    }
+                    else {
+                        System.out.println("En attente de l'action de l'autre joueur");
+                    }
+                }
+            }
+    }
+
     public void lancement() {
         boolean continuer = true;
         Scanner scanner = new Scanner(System.in);
@@ -65,6 +109,23 @@ public class Client {
         boolean connecte = false;
         this.socketClient.start();
             while (continuer) {
+                if (connecte) {
+                    if (nouveauMessage) {
+                        String[] messages = this.message.split(" ");
+                        if (messages[0].split("\n")[0].equals("duel")) {
+                            System.out.println(messages[1].split("\n")[0] + "vous défi en duel, acceptez-vous ? (y/n)");
+                            s = scanner.nextLine();
+                            if (s.equals("n")) {
+                                    this.socketClient.envoyerCommande("duel "+s + " " + this.pseudo);
+                                }
+                            else if (s.equals("y")) {
+                                this.socketClient.envoyerCommande("duel "+s);
+                                lancerPartie();
+                            }
+                            }
+
+                        }
+                    }
                 System.out.println("Quel message ? ");
                 s = scanner.nextLine();
                 String[] messages = s.split(" "); // Avec split de sépare le message en deux grâce aux espaces
@@ -82,10 +143,12 @@ public class Client {
                     if (this.message.split("\n")[0].equals("OK")) {
                         System.out.println("Connexion réussie !");
                         connecte = true;
+                        this.pseudo = messages[1];
                     }
                     else {
                         System.out.println("Erreur : " + this.message);
                     }
+                    this.nouveauMessage = false;
                     
                 }
                 else if (messages[0].equals("players")) {
@@ -100,13 +163,27 @@ public class Client {
                     }
                     System.out.println("Liste des autres joueurs : " +this.message);
                 }
+                this.nouveauMessage = false;
             }
 
                 else if (messages[0].equals("ask")) {
-                    this.socketClient.envoyerCommande("ask "+ messages[1]);
-                }
-                else if (messages[0].equals("play")) {
-                    this.socketClient.envoyerCommande("play "+ messages[1]);
+                    synchronized (lock) {
+                        this.socketClient.envoyerCommande("ask "+ messages[1]);
+                        while (!nouveauMessage) {
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if (this.message.split("\n")[0].equals("accepte")) {
+                            lancerPartie();
+                        }
+                        else if (this.message.split("\n")[0].equals("refuse")) {
+                            System.out.println("Le joueur n'a pas accepté le duel :(");
+                        }
+                    }
+                    this.nouveauMessage = false;
                 }
                 else if (s.equals("quit")) {
                     this.socketClient.envoyerCommande("quit " + this.ipClient);
