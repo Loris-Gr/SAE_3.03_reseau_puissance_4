@@ -105,12 +105,16 @@ public class Serveur {
     }
 
     public ClientHandler getHandler(String pseudo) {
-        for (ClientHandler handler : clientHandlers) {
+        for (ClientHandler handler : this.clientHandlers) {
             if (handler.getPseudo().equals(pseudo)) {
                 return handler;
             }
         }
         return null;
+    }
+
+    public void ajoutHandler(ClientHandler handler) {
+        this.clientHandlers.add(handler);
     }
 
     public void lancerPartie(ClientHandler joueur1, ClientHandler joueur2) {
@@ -123,19 +127,20 @@ public class Serveur {
     }
 
 
-    public void start() throws IOException {
-        ServerSocket socketServer = new ServerSocket(4444);
+    public static void main(String[] args) {
         while (true) {
-                Socket socketClient = socketServer.accept();
-                ClientHandler clientHandler = new ClientHandler(socketClient, this);
-                Thread clientThread = new Thread(clientHandler);
-                clientThread.start();
-                synchronized (this.clientHandlers) {
-                    this.clientHandlers.add(clientHandler);
-                }
+            try {
+                ServerSocket socketServer = new ServerSocket(4444);
+                //Socket socketClient = socketServer.accept();
+                Thread t = new Thread(new ConnexionServeur(socketServer));
+                t.start();
                 System.out.println("connexion d'un client");
-                socketClient.close();
+                //socketClient.close();
                 socketServer.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -54,8 +54,8 @@ public class ClientHandler implements Runnable {
                     boolean etat = tupleRetour.estValide();
                     String retour = tupleRetour.getMessage(); 
                     if (etat) {
-                        this.envoyerMessage("OK");
                         this.pseudo = messages[1];
+                        this.envoyerMessage("OK");
                     }
                     else {
                         this.envoyerMessage("ERR, " + retour);
@@ -79,7 +79,7 @@ public class ClientHandler implements Runnable {
                     }
                     if (messages[1].equals("y")) {
                         ClientHandler adversaireHandler = serveur.getHandler(messages[2]);
-                        this.envoyerMessage("accepte");
+                        adversaireHandler.envoyerMessage("accepte");
                         serveur.lancerPartie(this, adversaireHandler);
                     }
                 }
@@ -111,6 +111,11 @@ public class ClientHandler implements Runnable {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Pseudo de l'handler : " + this.pseudo;
     }
 
 }

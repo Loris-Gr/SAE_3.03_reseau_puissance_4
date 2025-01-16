@@ -4,7 +4,20 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
+        {
+            "type": "java",
+            "name": "ClientExecutable",
+            "request": "launch",
+            "mainClass": "reseau.Executable.ClientExecutable",
+            "projectName": "SAE_3.03_reseau_puissance_4_519d65a2"
+        },
+        {
+            "type": "java",
+            "name": "ServeurExecutable",
+            "request": "launch",
+            "mainClass": "reseau.Executable.ServeurExecutable",
+            "projectName": "SAE_3.03_reseau_puissance_4_519d65a2"
+        },
         {
             "type": "java",
             "name": "Current File",
@@ -14,7 +27,7 @@
         {
             "type": "java",
             "name": "Puissance4Terminal",
-            "request": "launch", 
+            "request": "launch",
             "mainClass": "Puissance4Terminal.Puissance4Terminal",
             "projectName": "SAE_3.03_reseau_puissance_4_38c8469e"
         },

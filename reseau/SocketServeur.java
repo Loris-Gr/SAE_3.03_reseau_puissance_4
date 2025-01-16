@@ -17,7 +17,9 @@ public class SocketServeur extends Thread{
         try {
             while (true) {
                 Socket socketClient = socketServeur.accept();
-                Thread t = new Thread(new ClientHandler(socketClient, this.serveur));
+                ClientHandler handler = new ClientHandler(socketClient, this.serveur);
+                serveur.ajoutHandler(handler);
+                Thread t = new Thread(handler);
                 t.start();
                 System.out.println("connexion d'un client : \n");
             }

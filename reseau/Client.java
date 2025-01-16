@@ -74,7 +74,6 @@ public class Client {
         Scanner scanner = new Scanner(System.in);
         String s;
         this.partieEnCours = true;
-        this.nouveauMessage = false;
             while (this.partieEnCours) {
                 synchronized (lock) {
                     while (!nouveauMessage) {
@@ -109,17 +108,18 @@ public class Client {
         boolean connecte = false;
         this.socketClient.start();
             while (continuer) {
+                System.out.println(this.message);
                 if (connecte) {
                     if (nouveauMessage) {
                         String[] messages = this.message.split(" ");
                         if (messages[0].split("\n")[0].equals("duel")) {
-                            System.out.println(messages[1].split("\n")[0] + "vous défi en duel, acceptez-vous ? (y/n)");
+                            System.out.println(messages[1].split("\n")[0] + " vous défi en duel, acceptez-vous ? (y/n)");
                             s = scanner.nextLine();
                             if (s.equals("n")) {
                                     this.socketClient.envoyerCommande("duel "+s + " " + this.pseudo);
                                 }
                             else if (s.equals("y")) {
-                                this.socketClient.envoyerCommande("duel "+s);
+                                this.socketClient.envoyerCommande("duel "+s+ " " + this.pseudo);
                                 lancerPartie();
                             }
                             }
@@ -192,8 +192,6 @@ public class Client {
                 else {
                     System.out.println("Erreur, commande inconnue");
                 }
-                nouveauMessage = false;
-                this.message = "";
             }
             scanner.close();
     }        
