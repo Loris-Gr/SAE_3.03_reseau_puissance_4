@@ -48,9 +48,13 @@ public class Partie {
             return;
         }
 
-        puissance4.changerJoueur();
-        ClientHandler joueurActif = puissance4.getJoueur() == Equipe.JAUNE ? joueur1 : joueur2;
-        joueurActif.envoyerMessage("play");
-        (joueurActif == joueur1 ? joueur2 : joueur1).envoyerMessage("wait");
+        Equipe equipeSuivante = puissance4.getJoueur();
+        if (equipeSuivante == Equipe.JAUNE) {
+            joueur1.envoyerMessage("play"); // Le joueur 1 joue
+            joueur2.envoyerMessage("wait"); // Le joueur 2 attend
+        } else {
+            joueur1.envoyerMessage("wait"); // Le joueur 1 attend
+            joueur2.envoyerMessage("play"); // Le joueur 2 joue
+        }
     }
 }
