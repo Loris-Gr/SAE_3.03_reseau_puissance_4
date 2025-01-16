@@ -10,42 +10,42 @@ public class DirectionTest {
 
     @Test
     public void testGetOffsetL() {
-        assertEquals(-1, Direction.HAUT_GAUCHE.getOffsetL());
-        assertEquals(-1, Direction.HAUT.getOffsetL());
-        assertEquals(-1, Direction.HAUT_DROITE.getOffsetL());
-        assertEquals(0, Direction.GAUCHE.getOffsetL());
-        assertEquals(0, Direction.DROITE.getOffsetL());
-        assertEquals(1, Direction.BAS_GAUCHE.getOffsetL());
-        assertEquals(1, Direction.BAS.getOffsetL());
-        assertEquals(1, Direction.BAS_DROITE.getOffsetL());
+        assertEquals(-1, GrilleBD.HAUT_GAUCHE.getOffsetL());
+        assertEquals(-1, GrilleBD.HAUT.getOffsetL());
+        assertEquals(-1, GrilleBD.HAUT_DROITE.getOffsetL());
+        assertEquals(0, GrilleBD.GAUCHE.getOffsetL());
+        assertEquals(0, GrilleBD.DROITE.getOffsetL());
+        assertEquals(1, GrilleBD.BAS_GAUCHE.getOffsetL());
+        assertEquals(1, GrilleBD.BAS.getOffsetL());
+        assertEquals(1, GrilleBD.BAS_DROITE.getOffsetL());
     }
 
     @Test
     public void testGetOffsetC() {
-        assertEquals(-1, Direction.HAUT_GAUCHE.getOffsetC());
-        assertEquals(0, Direction.HAUT.getOffsetC());
-        assertEquals(1, Direction.HAUT_DROITE.getOffsetC());
-        assertEquals(-1, Direction.GAUCHE.getOffsetC());
-        assertEquals(1, Direction.DROITE.getOffsetC());
-        assertEquals(-1, Direction.BAS_GAUCHE.getOffsetC());
-        assertEquals(0, Direction.BAS.getOffsetC());
-        assertEquals(1, Direction.BAS_DROITE.getOffsetC());
+        assertEquals(-1, GrilleBD.HAUT_GAUCHE.getOffsetC());
+        assertEquals(0, GrilleBD.HAUT.getOffsetC());
+        assertEquals(1, GrilleBD.HAUT_DROITE.getOffsetC());
+        assertEquals(-1, GrilleBD.GAUCHE.getOffsetC());
+        assertEquals(1, GrilleBD.DROITE.getOffsetC());
+        assertEquals(-1, GrilleBD.BAS_GAUCHE.getOffsetC());
+        assertEquals(0, GrilleBD.BAS.getOffsetC());
+        assertEquals(1, GrilleBD.BAS_DROITE.getOffsetC());
     }
 
     @Test
     public void testGetVoisin() {
-        Coords coord = Direction.HAUT_GAUCHE.getVoisin(2, 2);
+        Coords coord = GrilleBD.HAUT_GAUCHE.getVoisin(2, 2);
         assertEquals(1, coord.getL());
         assertEquals(1, coord.getC());
 
-        coord = Direction.BAS_DROITE.getVoisin(2, 2);
+        coord = GrilleBD.BAS_DROITE.getVoisin(2, 2);
         assertEquals(3, coord.getL());
         assertEquals(3, coord.getC());
     }
 
     @Test
     public void testVoisinsWithCoordinates() {
-        Coords[] voisins = Direction.voisins(2, 2);
+        Coords[] voisins = GrilleBD.voisins(2, 2);
         assertEquals(8, voisins.length);
         assertTrue(containsCoord(voisins, new Coords(1, 1)));
         assertTrue(containsCoord(voisins, new Coords(1, 2)));
@@ -59,7 +59,7 @@ public class DirectionTest {
 
     @Test
     public void testVoisins() {
-        Coords[] voisins = Direction.voisins();
+        Coords[] voisins = GrilleBD.voisins();
         assertEquals(8, voisins.length);
         assertTrue(containsCoord(voisins, new Coords(-1, -1)));
         assertTrue(containsCoord(voisins, new Coords(-1, 0)));
@@ -73,14 +73,14 @@ public class DirectionTest {
 
     @Test
     public void testToString() {
-        assertEquals("HG", Direction.HAUT_GAUCHE.toString());
-        assertEquals("H", Direction.HAUT.toString());
-        assertEquals("HD", Direction.HAUT_DROITE.toString());
-        assertEquals("G", Direction.GAUCHE.toString());
-        assertEquals("D", Direction.DROITE.toString());
-        assertEquals("BG", Direction.BAS_GAUCHE.toString());
-        assertEquals("B", Direction.BAS.toString());
-        assertEquals("BD", Direction.BAS_DROITE.toString());
+        assertEquals("HG", GrilleBD.HAUT_GAUCHE.toString());
+        assertEquals("H", GrilleBD.HAUT.toString());
+        assertEquals("HD", GrilleBD.HAUT_DROITE.toString());
+        assertEquals("G", GrilleBD.GAUCHE.toString());
+        assertEquals("D", GrilleBD.DROITE.toString());
+        assertEquals("BG", GrilleBD.BAS_GAUCHE.toString());
+        assertEquals("B", GrilleBD.BAS.toString());
+        assertEquals("BD", GrilleBD.BAS_DROITE.toString());
     }
 
     private boolean containsCoord(Coords[] coordsArray, Coords coord) {

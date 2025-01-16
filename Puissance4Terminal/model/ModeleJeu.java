@@ -1,4 +1,4 @@
-package Puissance4Terminal;
+package Puissance4Terminal.model;
 
 public class ModeleJeu {
     public static final int LIGNES = 6; // Nombre de lignes

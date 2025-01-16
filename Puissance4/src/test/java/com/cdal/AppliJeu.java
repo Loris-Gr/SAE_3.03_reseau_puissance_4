@@ -27,7 +27,7 @@ import javafx.stage.Stage;
  */
 public class AppliJeu extends Application{
     private ModeleJeu modele;
-    private Grille grille;
+    private GrilleBD grille;
     private Label tourL;
     private Label scoreJ;
     private Label scoreR;
@@ -94,7 +94,7 @@ public class AppliJeu extends Application{
         vb.getChildren().addAll(s, this.scoreJ, this.scoreR);
         bp.setRight(vb);
         
-        this.grille = new Grille();
+        this.grille = new GrilleBD();
         bp.setCenter(this.grille);
         return bp;
     }
@@ -170,7 +170,7 @@ public class AppliJeu extends Application{
      * Retourne le modèle du jeu
      * @return Le modèle du jeu
      */
-    public Grille getGrille() {
+    public GrilleBD getGrille() {
         return grille;
     }
 
