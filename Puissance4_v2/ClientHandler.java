@@ -2,6 +2,9 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
+import bd.ConnexionMySQL;
+import bd.PartieBD;
+
 public class ClientHandler extends Thread {
     private String pseudo;
     private Socket socket;
@@ -40,9 +43,26 @@ public class ClientHandler extends Thread {
         this.adversaire = adversaire;
     }
 
+
+    
+
     @Override
     public void run() {
-        String commande;
+        ConnexionMySQL connexion = null;
+        try {
+            connexion = new ConnexionMySQL();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        try {
+            connexion.connecter("servinfo-maria", "DBvergerolle", "vergerolle", "vergerolle");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        PartieBD partieBD = new PartieBD(connexion);
+
+            String commande;
         try {
             while (true) {
                 commande = this.in.readLine();  // Lire la commande du client
@@ -149,6 +169,22 @@ public class ClientHandler extends Thread {
                         modele.getGrille().afficher();
                         this.out.println("Le joueur " + modele.getJoueur() + " a gagné !");
                         this.adversaire.out.println("Le joueur " + modele.getJoueur() + " a gagné !");
+
+                        try {
+                            this.out.println("Enregistrement de la partie...");
+                            partieBD.enregistrerPartie(modele.getJoueur().getId(), new java.sql.Date(System.currentTimeMillis()));
+                            int score = partieBD.getScore(modele.getJoueur().getSymbole()) + 1;
+                            partieBD.setScore(modele.getJoueur().getSymbole(), score);
+                
+                            int scoreJoueur1 = partieBD.getScore(modele.getJoueur().getSymbole());    
+                            int scoreJoueur2 = partieBD.getScore(modele.getJoueur().getSymbole());
+                            System.out.println("Score du joueur " +  modele.getJoueur().getSymbole()+ " : " + scoreJoueur1);
+                            System.out.println("Score du joueur " + modele.getJoueur().getSymbole()  + " : " + scoreJoueur2);
+                            
+                        } catch (java.sql.SQLException e) {
+                            e.printStackTrace();
+                        }
+                
 
                         this.adversaire.modele = null;
                         this.modele = null;

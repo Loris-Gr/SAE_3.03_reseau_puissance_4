@@ -27,6 +27,28 @@ public class PartieBD {
         return equipeGagnante;
     }
 
+    public void creerJoueur(String nom){
+        try {
+            String query = "INSERT INTO EQUIPE VALUES (?, 0)";
+            PreparedStatement ps = this.laConnexionMySQL.prepareStatement(query);
+            ps.setString(1, nom);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void reloadPartieBD(){
+        try {
+            String query = "DELETE FROM PARTIE";
+            PreparedStatement ps = this.laConnexionMySQL.prepareStatement(query);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void enregistrerPartie(int idEquGagn, Date datePartie) throws SQLException {
         String query = "INSERT INTO PARTIE (datePart, idEquGagn) VALUES (?, ?)";
