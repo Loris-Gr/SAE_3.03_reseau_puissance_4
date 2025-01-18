@@ -8,10 +8,12 @@ public class Serveur extends Thread {
     private ServerSocket serverSocket;
     private int port;
     private List<ClientHandler> clientHandlers;
+    private List<PartieEnCours> partieEnCours;
 
     public Serveur(int port) {
         this.port = port;
         this.clientHandlers = new ArrayList<>();
+        this.partieEnCours = new ArrayList<>();
     }
 
     public ClientHandler trouverJoueur(String pseudo) {
@@ -21,6 +23,33 @@ public class Serveur extends Thread {
             }
         }
         return null;
+    }
+
+    public void challegerJoueur(ClientHandler joueur1, String joueur2){
+        ClientHandler clientHandler = this.trouverJoueur(joueur2);
+        if (clientHandler == null) {
+            joueur1.getOut().println("Joueur " + joueur2 + " non trouvé");;
+        }
+        else {
+            joueur1.getOut().println("En attente de réponse de " + joueur2 + " ...");
+            joueur1.setAdversaire(clientHandler);
+
+            clientHandler.getOut().println("Le joueur " + joueur1.getPseudo() + " veut vous affronter");
+            clientHandler.getOut().println("Acceptez-vous ? (o/n)");
+            
+            clientHandler.setAdversaire(joueur1);
+            clientHandler.setDuelPropose(true);
+        }
+    }
+
+    public void creerPartie(ClientHandler joueur1, ClientHandler joueur2) {
+        joueur1.getOut().println("Partie Créée");
+        joueur2.getOut().println("Partie Créée");
+    }
+
+    public void refuserPartie(ClientHandler joueur1, ClientHandler joueur2) {
+        joueur1.getOut().println("Duel Créée");
+        joueur2.getOut().println("Duel Refusée");
     }
 
     public void run() {
