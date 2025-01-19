@@ -1,3 +1,7 @@
+/**
+ * PartieEnCours représente une partie de jeu en cours entre deux joueurs.
+ * Elle est exécutée dans un thread distinct pour permettre la gestion des interactions en temps réel.
+ */
 public class PartieEnCours extends Thread {
     
     private ModeleJeu modele;
@@ -5,7 +9,14 @@ public class PartieEnCours extends Thread {
     private ClientHandler joueur1;
     private ClientHandler joueur2;
     private ClientHandler joueurActuel;
-
+    
+    /**
+     * Constructeur de la classe PartieEnCours.
+     *
+     * @param joueur1 Le premier joueur de la partie.
+     * @param joueur2 Le second joueur de la partie.
+     * @param serveur Le serveur gérant la partie.
+     */
     public PartieEnCours(ClientHandler joueur1, ClientHandler joueur2, Serveur serveur) {
         this.modele = new ModeleJeu(Equipe.JAUNE);
         this.serveur = serveur;
@@ -13,18 +24,37 @@ public class PartieEnCours extends Thread {
         this.joueur2 = joueur2;
     }
 
+    /**
+     * Récupère le premier joueur de la partie.
+     *
+     * @return Le premier joueur.
+     */
     public ClientHandler getJoueur1() {
         return joueur1;
     }
-
+    
+    /**
+     * Récupère le second joueur de la partie.
+     *
+     * @return Le second joueur.
+     */
     public ClientHandler getJoueur2() {
         return joueur2;
     }
 
+    /**
+     * Récupère le modèle du jeu associé à cette partie.
+     *
+     * @return Le modèle du jeu.
+     */
     public ModeleJeu getModele() {
         return modele;
     }
 
+    /**
+     * Point d'entrée du thread, gérant la logique de la partie.
+     * Les joueurs jouent tour à tour jusqu'à ce qu'il y ait un gagnant ou un match nul.
+     */
     @Override
     public void run() {
         System.out.println();

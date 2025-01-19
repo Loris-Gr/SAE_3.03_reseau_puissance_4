@@ -8,6 +8,14 @@ public class Client extends Thread {
     private int port;
     private String host;
 
+    /**
+     * Constructeur de la classe Client.
+     *
+     * @param port Le port sur lequel le serveur écoute.
+     * @param host L'adresse du serveur.
+     * @throws UnknownHostException Si l'adresse du serveur est introuvable.
+     * @throws IOException          Si une erreur survient lors de la création des flux.
+     */
     public Client(int port, String host) throws UnknownHostException, IOException {
         this.host = host;
         this.port = port;
@@ -16,6 +24,11 @@ public class Client extends Thread {
         this.out = new PrintWriter(socket.getOutputStream(), true);
     }
 
+    /**
+     * Méthode exécutée par le thread, gérant la communication entre le client et le serveur.
+     * Elle lit les messages de l'utilisateur pour les envoyer au serveur
+     * et démarre un thread séparé pour lire les messages reçus du serveur.
+     */
     @Override
     public void run() {
         try {

@@ -12,6 +12,13 @@ public class ClientHandler extends Thread {
     private boolean duelPropose;
     private boolean enDuel;
 
+    /**
+     * Constructeur de la classe ClientHandler.
+     *
+     * @param socket  Le socket utilisé pour communiquer avec le client.
+     * @param serveur Référence au serveur principal.
+     * @throws IOException En cas d'erreur lors de la création des flux.
+     */
     public ClientHandler(Socket socket, Serveur serveur) throws IOException {
         this.socket = socket;
         this.serveur = serveur;
@@ -22,47 +29,99 @@ public class ClientHandler extends Thread {
         this.enDuel = false;
     }
 
-    // getters et setters
+    /**
+     * Récupère le pseudo du joueur.
+     *
+     * @return Le pseudo du joueur.
+     */
     public String getPseudo() {
         return pseudo;
     }
 
+    /**
+     * Définit le pseudo du joueur.
+     *
+     * @param pseudo Le pseudo à définir.
+     */
     public void setPseudo(String pseudo) {
         this.pseudo = pseudo;
     }
 
+    /**
+     * Récupère la référence au serveur principal.
+     *
+     * @return La référence au serveur principal.
+     */
     public Serveur getServeur() {
         return serveur;
     }
 
+    /**
+     * Récupère l'adversaire actuel du joueur.
+     *
+     * @return L'adversaire actuel.
+     */
     public ClientHandler getAdversaire() {
         return adversaire;
     }
+
+    /**
+     * Définit l'adversaire actuel du joueur.
+     *
+     * @param adversaire L'adversaire à définir.
+     */
     public void setAdversaire(ClientHandler adversaire) {
         this.adversaire = adversaire;
     }
 
+    /**
+     * Récupère le flux de sortie utilisé pour communiquer avec le client.
+     *
+     * @return Le flux de sortie.
+     */
     public PrintWriter getOut() {
         return out;
     }
 
+    /**
+     * Définit si un duel a été proposé au joueur.
+     *
+     * @param duelPropose true si un duel a été proposé, sinon false.
+     */
     public void setDuelPropose(boolean duelPropose) {
         this.duelPropose = duelPropose;
     }
 
+    /**
+     * Récupère le flux d'entrée utilisé pour lire les messages du client.
+     *
+     * @return Le flux d'entrée.
+     */
     public BufferedReader getIn() {
         return in;
     }
 
+    /**
+     * Indique si le joueur est actuellement en duel.
+     *
+     * @return true si le joueur est en duel, sinon false.
+     */
     public boolean getEnDuel() {
         return enDuel;
     }
 
+    /**
+     * Définit si le joueur est actuellement en duel.
+     *
+     * @param enDuel true si le joueur est en duel, sinon false.
+     */
     public void setEnDuel(boolean enDuel) {
         this.enDuel = enDuel;
     }
     
-
+    /**
+     * Méthode exécutée par le thread, gère les commandes reçues du client.
+     */
     @Override
     public void run() {
         String commande;

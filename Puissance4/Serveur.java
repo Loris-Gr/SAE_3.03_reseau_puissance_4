@@ -7,6 +7,10 @@ import java.util.List;
 import bd.ConnexionMySQL;
 import bd.PartieBD;
 
+/**
+ * Serveur est une classe qui représente le serveur d'un système de jeu multijoueur. 
+ * Elle gère les connexions des clients, les interactions entre joueurs et l'enregistrement des parties.
+ */
 public class Serveur extends Thread {
     private ServerSocket serverSocket;
     private int port;
@@ -14,6 +18,14 @@ public class Serveur extends Thread {
     private List<PartieEnCours> lesPartiesEnCours;
     private ConnexionMySQL connexion = null;
 
+    /**
+     * Constructeur de la classe Serveur.
+     *
+     * @param port      Le port sur lequel le serveur écoute.
+     * @param connexion La connexion à la base de données.
+     * @throws ClassNotFoundException Si une classe requise est introuvable.
+     * @throws SQLException           Si une erreur SQL se produit.
+     */
     public Serveur(int port, ConnexionMySQL connexion) throws ClassNotFoundException, SQLException {
         this.port = port;
         this.clientHandlers = new ArrayList<>();
@@ -21,7 +33,12 @@ public class Serveur extends Thread {
         this.connexion = connexion;
     }
 
-    // Connexion d'un joueur
+    /**
+     * Connecte un joueur au serveur.
+     *
+     * @param client     Le client à connecter.
+     * @param nomJoueur  Le pseudo du joueur.
+     */
     public void connecter(ClientHandler client, String nomJoueur) {
         ClientHandler clientHandler = this.trouverJoueur(nomJoueur);
         if (clientHandler == null) {
@@ -34,7 +51,12 @@ public class Serveur extends Thread {
         
     }
 
-    // Trouver un joueur dans la liste des joueurs
+    /**
+     * Recherche un joueur par son pseudo.
+     *
+     * @param pseudo Le pseudo du joueur.
+     * @return Le ClientHandler correspondant, ou null si aucun joueur n'est trouvé.
+     */
     public ClientHandler trouverJoueur(String pseudo) {
         for (ClientHandler clientHandler : clientHandlers) {
             if (clientHandler.getPseudo() != null && clientHandler.getPseudo().equals(pseudo)) {
@@ -44,7 +66,12 @@ public class Serveur extends Thread {
         return null;
     }
 
-    // Envoie de demande de duel
+    /**
+     * Envoie une demande de duel à un autre joueur.
+     *
+     * @param joueur1 Le joueur qui initie le défi.
+     * @param joueur2 Le pseudo du joueur défié.
+     */
     public void challegerJoueur(ClientHandler joueur1, String joueur2){
         ClientHandler clientHandler = this.trouverJoueur(joueur2);
         if (clientHandler == null) {
@@ -62,7 +89,12 @@ public class Serveur extends Thread {
         }
     }
 
-    // Création d'un partie
+    /**
+     * Crée une partie entre deux joueurs.
+     *
+     * @param joueur1 Le premier joueur.
+     * @param joueur2 Le second joueur.
+     */
     public void creerPartie(ClientHandler joueur1, ClientHandler joueur2) {
         PartieEnCours partie = new PartieEnCours(joueur1, joueur2, this);
         joueur1.getOut().println("Partie Créée");
@@ -76,13 +108,26 @@ public class Serveur extends Thread {
         partie.start();
     }
 
-    // Refu d'une partie
+    /**
+     * Gère le refus d'une partie par un joueur.
+     *
+     * @param joueur1 Le joueur ayant proposé le duel.
+     * @param joueur2 Le joueur ayant refusé.
+     */
     public void refuserPartie(ClientHandler joueur1, ClientHandler joueur2) {
         joueur1.getOut().println("Le joueur " + joueur2.getPseudo() + " à refusé le duel");
         joueur2.getOut().println("Vous avez refusé le duel");
     }
 
-    // Enregistrement d'une partie + joueur plus en duel
+    /**
+     * Termine une partie, enregistre les résultats et met à jour l'état des joueurs.
+     *
+     * @param partieEnCours La partie en cours.
+     * @param joueur1       Le premier joueur.
+     * @param joueur2       Le second joueur.
+     * @param gagnant       Le gagnant de la partie, ou null en cas d'égalité.
+     * @throws ClassNotFoundException Si une classe requise est introuvable.
+     */
     public void finirPartie(PartieEnCours partieEnCours, ClientHandler joueur1, ClientHandler joueur2, ClientHandler gagnant) throws ClassNotFoundException {
         partieEnCours.getJoueur1().setEnDuel(false);
         partieEnCours.getJoueur2().setEnDuel(false);
@@ -116,12 +161,21 @@ public class Serveur extends Thread {
         this.lesPartiesEnCours.remove(partieEnCours);
     }
 
-    // Vérifie si un joueur est en duel
+    /**
+     * Vérifie si un joueur est disponible pour un duel.
+     *
+     * @param clientHandler Le joueur à vérifier.
+     * @return true si le joueur est disponible, false sinon.
+     */
     public boolean estDisponible(ClientHandler clientHandler) {
         return !clientHandler.getEnDuel();
     }
 
-    // Affichage de la liste des joueurs disponibles
+    /**
+     * Renvoie une liste des joueurs disponibles pour un duel.
+     *
+     * @return Une chaîne contenant les pseudos des joueurs disponibles.
+     */
     public String joueurDisponibles() {
         String res = "";
 
@@ -133,20 +187,37 @@ public class Serveur extends Thread {
         return res;
     }
 
-    // Affichage de l'historique d'un joueur
+    /**
+     * Récupère l'historique des parties d'un joueur.
+     *
+     * @param clientHandler Le joueur pour lequel récupérer l'historique.
+     * @return Une chaîne contenant l'historique des parties.
+     * @throws SQLException           Si une erreur SQL se produit.
+     * @throws ClassNotFoundException Si une classe requise est introuvable.
+     */
     public String historique(ClientHandler clientHandler) throws SQLException, ClassNotFoundException {
         PartieBD partieBD = new PartieBD(connexion);
         String histo = partieBD.historique(clientHandler.getPseudo());
         return histo;
     }
 
-    // Affichage du score d'un joueur
+    /**
+     * Récupère le score d'un joueur.
+     *
+     * @param clientHandler Le joueur pour lequel récupérer le score.
+     * @return Une chaîne contenant le score du joueur.
+     * @throws SQLException           Si une erreur SQL se produit.
+     * @throws ClassNotFoundException Si une classe requise est introuvable.
+     */
     public String score(ClientHandler clientHandler) throws SQLException, ClassNotFoundException {
         PartieBD partieBD = new PartieBD(connexion);
         int score = partieBD.getScore(clientHandler.getPseudo());
         return score + "";
     }
 
+    /**
+     * Point d'entrée du thread. Lance le serveur et gère les connexions clients.
+     */
     public void run() {
         try {
             this.serverSocket = new ServerSocket(this.port);
