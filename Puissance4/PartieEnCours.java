@@ -35,11 +35,10 @@ public class PartieEnCours extends Thread {
             try {
                 // Affichage de la grille et instructions pour le joueur
                 String affichage = modele.getGrille().afficher2();
-
                 joueur1.getOut().println(affichage); joueur2.getOut().println(affichage);
 
+                // On regarde le joueur dont la couleur correspond au client
                 Equipe couleur = modele.getJoueur();
-
                 if (couleur == Equipe.JAUNE) {
                     joueurActuel = joueur1;
                 }
@@ -49,10 +48,10 @@ public class PartieEnCours extends Thread {
                 joueur1.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
                 joueur2.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
 
-                // Lecture de la colonne choisie par le joueur
-
+                // Lecture de la colonne choisie par le joueur actuel
                 int colonne;
                 colonne = Integer.parseInt(joueurActuel.getIn().readLine());
+
                 // Validation de l'entrée utilisateur
                 if (colonne < 0 || colonne >= ModeleJeu.COLONNES) {
                     joueurActuel.getOut().println("Choix invalide, veuillez choisir une colonne entre 0 et 6.");

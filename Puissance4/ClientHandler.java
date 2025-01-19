@@ -8,7 +8,7 @@ public class ClientHandler extends Thread {
     private PrintWriter out;
     private BufferedReader in;
     private Serveur serveur;
-    private ClientHandler adversaire;  // Référence à l'adversaire qui reçoit la demande
+    private ClientHandler adversaire;
     private boolean duelPropose;
     private boolean enDuel;
 
@@ -22,6 +22,7 @@ public class ClientHandler extends Thread {
         this.enDuel = false;
     }
 
+    // getters et setters
     public String getPseudo() {
         return pseudo;
     }
@@ -67,9 +68,11 @@ public class ClientHandler extends Thread {
         String commande;
         try {
             while (true) {
+                // Tant que le joueur n'est pas en duel
+                // on regarde ce qu'il écrit
                 if (!enDuel) {
-
-                    commande = this.in.readLine();  // Lire la commande du client
+                    // Lire la commande du client
+                    commande = this.in.readLine();
                     if (commande == null || socket.isClosed()) {
                         break;
                     }
@@ -119,12 +122,10 @@ public class ClientHandler extends Thread {
                     else if (messages[0].equals("score")) {
                         this.out.println("Votre score est de : " + this.serveur.score(this));
                     }
-
                     else {
                         this.out.println("Commande inconnue");
                     }
-                }
-                else {
+                } else {
                     sleep(2);
                 }
             }
