@@ -7,6 +7,8 @@ public class PartieEnCours extends Thread {
     private Serveur serveur;
     private ClientHandler joueur1;
     private ClientHandler joueur2;
+    private ClientHandler joueurActuel;
+    private ClientHandler joueurEnAttente;
 
     public PartieEnCours(ClientHandler joueur1, ClientHandler joueur2, Serveur serveur) {
         this.modele = new ModeleJeu(Equipe.JAUNE);
@@ -38,13 +40,13 @@ public class PartieEnCours extends Thread {
 
             Equipe couleur = modele.getJoueur();
 
-            ClientHandler joueurActuel;
-
             if (couleur == Equipe.JAUNE) {
                 joueurActuel = joueur1;
+                joueurEnAttente = joueur2;
             }
             else {
                 joueurActuel = joueur2;
+                joueurEnAttente = joueur1;
             }
             joueur1.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
             joueur2.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
@@ -97,7 +99,7 @@ public class PartieEnCours extends Thread {
             }
         }
         try {
-            this.serveur.finirPartie(this);
+            this.serveur.finirPartie(this, joueurActuel, joueurEnAttente);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

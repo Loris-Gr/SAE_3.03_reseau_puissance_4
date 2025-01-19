@@ -27,15 +27,18 @@ public class PartieBD {
         return equipeGagnante;
     }
 
-    public void creerJoueur(String nom){
-        try {
-            String query = "INSERT INTO EQUIPE VALUES (?, 0)";
+    public void creerJoueur(String nomJoueur) throws SQLException{
+
+        String query1 = "SELECT score FROM JOUEUR WHERE nomJoueur = '" + nomJoueur + "'";
+        Statement stm = this.laConnexionMySQL.createStatement();
+        ResultSet rs = stm.executeQuery(query1);
+
+        if (!rs.next()) {
+            String query = "INSERT INTO JOUEUR VALUES (?, 0)";
             PreparedStatement ps = this.laConnexionMySQL.prepareStatement(query);
-            ps.setString(1, nom);
+            ps.setString(1, nomJoueur);
             ps.executeUpdate();
             ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -50,18 +53,20 @@ public class PartieBD {
         }
     }
 
-    public void enregistrerPartie(int idEquGagn, Date datePartie) throws SQLException {
-        String query = "INSERT INTO PARTIE (datePart, idEquGagn) VALUES (?, ?)";
+    public void enregistrerPartie(String joueur1, String joueur2, String gagnant, Date datePartie) throws SQLException {
+        String query = "INSERT INTO PARTIE (datePart, joueur1, joueur2, gagnant) VALUES (?, ?, ?, ?)";
         PreparedStatement ps = this.laConnexionMySQL.prepareStatement(query);
         ps.setDate(1, datePartie);
-        ps.setInt(2, idEquGagn);
+        ps.setString(2, joueur1);
+        ps.setString(3, joueur2);
+        ps.setString(4, gagnant);
 
         ps.executeUpdate();
         ps.close();
     }
 
-    public int getScore(String nomEqu) throws SQLException {
-        String query = "SELECT (score) AS score FROM EQUIPE WHERE symbole = '" + nomEqu + "'";
+    public int getScore(String nomJoueur) throws SQLException {
+        String query = "SELECT score FROM JOUEUR WHERE nomJoueur = '" + nomJoueur + "'";
         Statement stm = this.laConnexionMySQL.createStatement();
         ResultSet rs = stm.executeQuery(query);
         int score = 0;
@@ -74,12 +79,12 @@ public class PartieBD {
         return score;
     }
 
-    public void setScore(String nomEqu, int newScore) throws SQLException {
-        String query = "UPDATE EQUIPE SET score = ? WHERE symbole = ?";
+    public void setScore(String nomJoueur, int newScore) throws SQLException {
+        String query = "UPDATE JOUEUR SET score = ? WHERE nomJoueur = ?";
         PreparedStatement ps = this.laConnexionMySQL.prepareStatement(query);
         ps.setInt(1, newScore);
-        ps.setString(2, nomEqu);
-        System.out.println("Score augmenté de 1 pour l'équipe " + nomEqu);
+        ps.setString(2, nomJoueur);
+        System.out.println("Score augmenté de 1 pour le joueur " + nomJoueur);
 
         ps.executeUpdate();
         ps.close();

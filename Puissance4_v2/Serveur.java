@@ -63,29 +63,30 @@ public class Serveur extends Thread {
         joueur2.getOut().println("Duel Refusée");
     }
 
-    public void finirPartie(PartieEnCours partieEnCours) throws ClassNotFoundException {
-        partieEnCours.getJoueur1().setEnDuel(false);
-        partieEnCours.getJoueur2().setEnDuel(false);
+    public void finirPartie(PartieEnCours partieEnCours, ClientHandler gagnant, ClientHandler perdant) throws ClassNotFoundException {
+        gagnant.setEnDuel(false);
+        perdant.setEnDuel(false);
 
         ModeleJeu modele = partieEnCours.getModele();
 
         try {
+            // Enregistrement de la partie
             ConnexionMySQL connexion = null;
             connexion = new ConnexionMySQL();
             connexion.connecter("localhost", "puissance4", "hun", "");
-            PartieBD partieBD = new PartieBD(connexion);
-            System.out.println("Enregistrement de la partie...");
-            
-            partieBD.enregistrerPartie(modele.getJoueur().getId(), new java.sql.Date(System.currentTimeMillis()));
-            int score = partieBD.getScore(modele.getJoueur().getSymbole()) + 1;
-            partieBD.setScore(modele.getJoueur().getSymbole(), score);
 
-            int scoreJoueur1 = partieBD.getScore(modele.getJoueur().getSymbole());    
-            int scoreJoueur2 = partieBD.getScore(modele.getJoueur().getSymbole());
-            System.out.println("Score du joueur " +  modele.getJoueur().getSymbole()+ " : " + scoreJoueur1);
-            System.out.println("Score du joueur " + modele.getJoueur().getSymbole()  + " : " + scoreJoueur2);
+            PartieBD partieBD = new PartieBD(connexion);
+            partieBD.creerJoueur(gagnant.getPseudo());
+            partieBD.creerJoueur(perdant.getPseudo());
+
+            System.out.println("Enregistrement de la partie...");
+            partieBD.enregistrerPartie(gagnant.getPseudo(), perdant.getPseudo(), gagnant.getPseudo(), new java.sql.Date(System.currentTimeMillis()));
+
+            int score = partieBD.getScore(gagnant.getPseudo()) + 1;
+            partieBD.setScore(gagnant.getPseudo(), score);
             
-            System.out.println("Partie enregistrée");
+            System.out.println("Partie de " + gagnant.getPseudo() + " et " + perdant.getPseudo() + " enregistrée");
+            
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
