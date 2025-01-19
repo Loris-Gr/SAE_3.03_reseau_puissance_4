@@ -79,11 +79,11 @@ public class ClientHandler extends Thread {
                     
                     System.out.println("Commande reçue de " + this.pseudo + ": " + commande);
                     String[] messages = commande.split(" ");
+
                     // Gérer la commande "bonjour"
                     if (messages[0].equals("bonjour")) {
                         this.out.println("Bonjour, " + this.getPseudo() + " !");
                     }
-
                     // Gérer la commande "connect"
                     else if (commande.contains("co")) {
                         try {
@@ -93,7 +93,6 @@ public class ClientHandler extends Thread {
                             this.out.println("Pseudo incorrect");
                         }
                     }
-
                     // Gérer la commande "ask"
                     else if (messages[0].equals("ask") && messages.length == 2) {
                         String adversairePseudo = messages[1];
@@ -104,7 +103,6 @@ public class ClientHandler extends Thread {
                             this.serveur.challegerJoueur(this, adversairePseudo);
                         }
                     }
-
                     // Gérer la réponse à l'adversaire
                     else if (messages[0].equals("o") || messages[0].equals("n")) {
                         if (this.duelPropose) {
@@ -117,10 +115,9 @@ public class ClientHandler extends Thread {
                             }
                         }
                     }
-
                     // Voir les joueurs pas en duel
                     else if (messages[0].equals("players")) {
-                        
+                        this.out.println(this.serveur.joueurDisponibles());
                     }
                     else {
                         this.out.println("Commande inconnue");
@@ -134,8 +131,7 @@ public class ClientHandler extends Thread {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            e.printStackTrace();
         } finally {
             try {
                 in.close();
@@ -146,4 +142,5 @@ public class ClientHandler extends Thread {
             }
         }
     }
+    
 }

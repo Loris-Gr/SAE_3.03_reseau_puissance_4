@@ -100,6 +100,21 @@ public class Serveur extends Thread {
         this.lesPartiesEnCours.remove(partieEnCours);
     }
 
+    public boolean estDisponible(ClientHandler clientHandler) {
+        return !clientHandler.getEnDuel();
+    }
+
+    public String joueurDisponibles() {
+        String res = "";
+
+        for (ClientHandler clientHandler : clientHandlers) {
+            if (estDisponible(clientHandler)) {
+                res += clientHandler.getPseudo() + " ";
+            }
+        }
+        return res;
+    }
+
     public void run() {
         try {
             this.serverSocket = new ServerSocket(this.port);
