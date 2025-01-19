@@ -1,0 +1,1 @@
+java -cp "Puissance4/bin/:lib/mariadb-java-client-debian.jar" ExecServ
