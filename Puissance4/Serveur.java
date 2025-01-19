@@ -21,6 +21,7 @@ public class Serveur extends Thread {
         this.connexion = connexion;
     }
 
+    // Connexion d'un joueur
     public void connecter(ClientHandler client, String nomJoueur) {
         ClientHandler clientHandler = this.trouverJoueur(nomJoueur);
         if (clientHandler == null) {
@@ -33,6 +34,7 @@ public class Serveur extends Thread {
         
     }
 
+    // Trouver un joueur dans la liste des joueurs
     public ClientHandler trouverJoueur(String pseudo) {
         for (ClientHandler clientHandler : clientHandlers) {
             if (clientHandler.getPseudo() != null && clientHandler.getPseudo().equals(pseudo)) {
@@ -42,6 +44,7 @@ public class Serveur extends Thread {
         return null;
     }
 
+    // Envoie de demande de duel
     public void challegerJoueur(ClientHandler joueur1, String joueur2){
         ClientHandler clientHandler = this.trouverJoueur(joueur2);
         if (clientHandler == null) {
@@ -59,6 +62,7 @@ public class Serveur extends Thread {
         }
     }
 
+    // Création d'un partie
     public void creerPartie(ClientHandler joueur1, ClientHandler joueur2) {
         PartieEnCours partie = new PartieEnCours(joueur1, joueur2, this);
         joueur1.getOut().println("Partie Créée");
@@ -72,11 +76,13 @@ public class Serveur extends Thread {
         partie.start();
     }
 
+    // Refu d'une partie
     public void refuserPartie(ClientHandler joueur1, ClientHandler joueur2) {
         joueur1.getOut().println("Le joueur " + joueur2.getPseudo() + " à refusé le duel");
         joueur2.getOut().println("Vous avez refusé le duel");
     }
 
+    // Enregistrement d'une partie + joueur plus en duel
     public void finirPartie(PartieEnCours partieEnCours, ClientHandler joueur1, ClientHandler joueur2, ClientHandler gagnant) throws ClassNotFoundException {
         partieEnCours.getJoueur1().setEnDuel(false);
         partieEnCours.getJoueur2().setEnDuel(false);
@@ -110,10 +116,12 @@ public class Serveur extends Thread {
         this.lesPartiesEnCours.remove(partieEnCours);
     }
 
+    // Vérifie si un joueur est en duel
     public boolean estDisponible(ClientHandler clientHandler) {
         return !clientHandler.getEnDuel();
     }
 
+    // Affichage de la liste des joueurs disponibles
     public String joueurDisponibles() {
         String res = "";
 
@@ -125,12 +133,14 @@ public class Serveur extends Thread {
         return res;
     }
 
+    // Affichage de l'historique d'un joueur
     public String historique(ClientHandler clientHandler) throws SQLException, ClassNotFoundException {
         PartieBD partieBD = new PartieBD(connexion);
         String histo = partieBD.historique(clientHandler.getPseudo());
         return histo;
     }
 
+    // Affichage du score d'un joueur
     public String score(ClientHandler clientHandler) throws SQLException, ClassNotFoundException {
         PartieBD partieBD = new PartieBD(connexion);
         int score = partieBD.getScore(clientHandler.getPseudo());
