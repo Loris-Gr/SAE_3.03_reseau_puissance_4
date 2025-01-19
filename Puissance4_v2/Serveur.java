@@ -59,15 +59,16 @@ public class Serveur extends Thread {
     }
 
     public void refuserPartie(ClientHandler joueur1, ClientHandler joueur2) {
-        joueur1.getOut().println("Duel Refusée");
-        joueur2.getOut().println("Duel Refusée");
+        joueur1.getOut().println("Le joueur " + joueur2.getPseudo() + " à refusé le duel");
+        joueur2.getOut().println("Vous avez refusé le duel");
     }
 
-    public void finirPartie(PartieEnCours partieEnCours, ClientHandler gagnant, ClientHandler perdant) throws ClassNotFoundException {
-        gagnant.setEnDuel(false);
-        perdant.setEnDuel(false);
+    public void finirPartie(PartieEnCours partieEnCours, ClientHandler joueur1, ClientHandler joueur2, ClientHandler gagnant) throws ClassNotFoundException {
+        partieEnCours.getJoueur1().setEnDuel(false);
+        partieEnCours.getJoueur2().setEnDuel(false);
 
-        ModeleJeu modele = partieEnCours.getModele();
+        partieEnCours.getJoueur1().setAdversaire(null);
+        partieEnCours.getJoueur2().setAdversaire(null);
 
         try {
             // Enregistrement de la partie
@@ -76,22 +77,26 @@ public class Serveur extends Thread {
             connexion.connecter("localhost", "puissance4", "hun", "");
 
             PartieBD partieBD = new PartieBD(connexion);
-            partieBD.creerJoueur(gagnant.getPseudo());
-            partieBD.creerJoueur(perdant.getPseudo());
+            partieBD.creerJoueur(joueur1.getPseudo());
+            partieBD.creerJoueur(joueur2.getPseudo());
 
-            System.out.println("Enregistrement de la partie...");
-            partieBD.enregistrerPartie(gagnant.getPseudo(), perdant.getPseudo(), gagnant.getPseudo(), new java.sql.Date(System.currentTimeMillis()));
+            if (gagnant != null) {
+                System.out.println("Enregistrement de la partie : " + joueur1.getPseudo() + " contre " + joueur2.getPseudo());
+                System.out.println("Vainqueur : " + gagnant.getPseudo());
+                partieBD.enregistrerPartie(joueur1.getPseudo(), joueur2.getPseudo(), gagnant.getPseudo(), new java.sql.Date(System.currentTimeMillis()));
+                int score = partieBD.getScore(gagnant.getPseudo()) + 1;
+                partieBD.setScore(gagnant.getPseudo(), score);
+                System.out.println();
+            }
+            else {
+                System.out.println("Enregistrement de la partie : " + joueur1.getPseudo() + " contre " + joueur2.getPseudo());
+                partieBD.enregistrerPartie(joueur1.getPseudo(), joueur2.getPseudo(), "null", new java.sql.Date(System.currentTimeMillis()));
+                System.out.println("Égalité");
+            }            
 
-            int score = partieBD.getScore(gagnant.getPseudo()) + 1;
-            partieBD.setScore(gagnant.getPseudo(), score);
-            
-            System.out.println("Partie de " + gagnant.getPseudo() + " et " + perdant.getPseudo() + " enregistrée");
-            
         } catch (java.sql.SQLException e) {
             e.printStackTrace();
         }
-
-        partieEnCours.interrupt();
         this.lesPartiesEnCours.remove(partieEnCours);
     }
 
@@ -111,6 +116,4 @@ public class Serveur extends Thread {
             e.printStackTrace();
         }
     }
-
-    // Vous pouvez également ajouter d'autres méthodes pour gérer les clients ou les messages
 }

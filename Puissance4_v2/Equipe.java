@@ -1,7 +1,7 @@
 public enum Equipe {
     AUCUNE(0, " "),
-    JAUNE(1, "J"),
-    ROUGE(2, "R");
+    JAUNE(1, "X"),
+    ROUGE(2, "O");
 
     private final int id; // Identifiant de l'équipe
     private final String symbole; // Symbole de l'équipe

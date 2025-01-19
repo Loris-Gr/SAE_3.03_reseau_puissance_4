@@ -31,30 +31,33 @@ public class PartieEnCours extends Thread {
 
     @Override
     public void run() {
+        System.out.println();
+        System.out.println("Début de la partie " + joueur1.getPseudo() + " contre " + joueur2.getPseudo());
+        System.out.println();
         while (true) {
-            // Affichage de la grille et instructions pour le joueur
-            String affichage = modele.getGrille().afficher2();
 
-            joueur1.getOut().println(affichage); joueur2.getOut().println(affichage);
-            System.out.println("go");
-
-            Equipe couleur = modele.getJoueur();
-
-            if (couleur == Equipe.JAUNE) {
-                joueurActuel = joueur1;
-                joueurEnAttente = joueur2;
-            }
-            else {
-                joueurActuel = joueur2;
-                joueurEnAttente = joueur1;
-            }
-            joueur1.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
-            joueur2.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
-
-            // Lecture de la colonne choisie par le joueur
-            
-            int colonne;
             try {
+                // Affichage de la grille et instructions pour le joueur
+                String affichage = modele.getGrille().afficher2();
+
+                joueur1.getOut().println(affichage); joueur2.getOut().println(affichage);
+
+                Equipe couleur = modele.getJoueur();
+
+                if (couleur == Equipe.JAUNE) {
+                    joueurActuel = joueur1;
+                    joueurEnAttente = joueur2;
+                }
+                else {
+                    joueurActuel = joueur2;
+                    joueurEnAttente = joueur1;
+                }
+                joueur1.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
+                joueur2.getOut().println("Joueur " + joueurActuel.getPseudo() + ", choisissez une colonne (0-6) :");
+
+                // Lecture de la colonne choisie par le joueur
+
+                int colonne;
                 colonne = Integer.parseInt(joueurActuel.getIn().readLine());
                 // Validation de l'entrée utilisateur
                 if (colonne < 0 || colonne >= ModeleJeu.COLONNES) {
@@ -73,8 +76,7 @@ public class PartieEnCours extends Thread {
                     joueur1.getOut().println(modele.getGrille().afficher2()); joueur2.getOut().println(modele.getGrille().afficher2());
                     joueur1.getOut().println("Le joueur " + joueurActuel.getPseudo() + " a gagné !");
                     joueur2.getOut().println("Le joueur " + joueurActuel.getPseudo() + " a gagné !");
-
-                    System.out.println("partie fini");
+                    this.serveur.finirPartie(this, joueur1, joueur2, joueurActuel);
                     break;
                 }
 
@@ -83,25 +85,16 @@ public class PartieEnCours extends Thread {
                     joueur1.getOut().println(modele.getGrille().afficher2()); joueur2.getOut().println(modele.getGrille().afficher2());
                     joueur1.getOut().println("Match nul !");
                     joueur2.getOut().println("Match nul !");
-
-                    System.out.println("zebi");
+                    this.serveur.finirPartie(this, joueur1, joueur2, null);
                     break;
-                }
-
-                else {
-                    joueurActuel.getOut().println("mauvais input");
                 }
 
                 // Changement de joueur
                 modele.changerJoueur();
+                
                 } catch (Exception e) {
                     e.getMessage();
             }
-        }
-        try {
-            this.serveur.finirPartie(this, joueurActuel, joueurEnAttente);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
     }
 }
