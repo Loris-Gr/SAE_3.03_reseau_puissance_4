@@ -88,9 +88,21 @@ public class PartieBD {
 
         ps.executeUpdate();
         ps.close();
-        
     }
 
-    
+    public String historique(String nomJoueur) throws SQLException {
+        String res = "date, joueur1, joueur2, gagnant \n";
+        String query = "SELECT * FROM PARTIE WHERE joueur1 = '" + nomJoueur + "' or joueur2 = '" + nomJoueur + "'";
+        Statement stm = this.laConnexionMySQL.createStatement();
+        ResultSet rs = stm.executeQuery(query);
+        while (rs.next()) {
+            String date = rs.getString(2);
+            String joueur1 = rs.getString(3);
+            String joueur2 = rs.getString(4);
+            String gagnant = rs.getString(5);
+            res += "(" + date + ", " + joueur1 + ", " + joueur2 + ", " + gagnant +  ")\n";
+        }
+        return res;
+    }
     
 }

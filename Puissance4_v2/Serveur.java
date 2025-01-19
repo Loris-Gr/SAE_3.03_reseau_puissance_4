@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,18 @@ public class Serveur extends Thread {
         this.port = port;
         this.clientHandlers = new ArrayList<>();
         this.lesPartiesEnCours = new ArrayList<>();
+    }
+
+    public void connecter(ClientHandler client, String nomJoueur) {
+        ClientHandler clientHandler = this.trouverJoueur(nomJoueur);
+        if (clientHandler == null) {
+            client.setPseudo(nomJoueur);
+            client.getOut().println("Bienvenue, " + nomJoueur + " !");
+        }
+        else {
+            client.getOut().println("Le pseudo " + nomJoueur + " est déjà utilisé");
+        }
+        
     }
 
     public ClientHandler trouverJoueur(String pseudo) {
@@ -113,6 +126,26 @@ public class Serveur extends Thread {
             }
         }
         return res;
+    }
+
+    public String historique(ClientHandler clientHandler) throws SQLException, ClassNotFoundException {
+        ConnexionMySQL connexion = null;
+        connexion = new ConnexionMySQL();
+        connexion.connecter("localhost", "puissance4", "hun", "");
+
+        PartieBD partieBD = new PartieBD(connexion);
+        String histo = partieBD.historique(clientHandler.getPseudo());
+        return histo;
+    }
+
+    public String score(ClientHandler clientHandler) throws SQLException, ClassNotFoundException {
+        ConnexionMySQL connexion = null;
+        connexion = new ConnexionMySQL();
+        connexion.connecter("localhost", "puissance4", "hun", "");
+
+        PartieBD partieBD = new PartieBD(connexion);
+        int score = partieBD.getScore(clientHandler.getPseudo());
+        return score + "";
     }
 
     public void run() {

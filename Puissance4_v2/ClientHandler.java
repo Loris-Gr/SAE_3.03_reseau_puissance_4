@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import bd.ConnexionMySQL;
@@ -85,13 +86,8 @@ public class ClientHandler extends Thread {
                         this.out.println("Bonjour, " + this.getPseudo() + " !");
                     }
                     // Gérer la commande "connect"
-                    else if (commande.contains("co")) {
-                        try {
-                            this.setPseudo(messages[1]);
-                            this.out.println("Bienvenue, " + this.getPseudo() + " !");
-                        } catch (Exception e) {
-                            this.out.println("Pseudo incorrect");
-                        }
+                    else if (messages[0].equals("co")) {
+                        this.serveur.connecter(this, messages[1]);
                     }
                     // Gérer la commande "ask"
                     else if (messages[0].equals("ask") && messages.length == 2) {
@@ -115,10 +111,19 @@ public class ClientHandler extends Thread {
                             }
                         }
                     }
-                    // Voir les joueurs pas en duel
+                    // Gérer la commande "players"
                     else if (messages[0].equals("players")) {
                         this.out.println(this.serveur.joueurDisponibles());
                     }
+                    // Gérer la commande "historique"
+                    else if (messages[0].equals("historique")) {
+                        this.out.println(this.serveur.historique(this));
+                    }
+                    // Gérer la commande "score"
+                    else if (messages[0].equals("score")) {
+                        this.out.println("Votre score est de : " + this.serveur.score(this));
+                    }
+
                     else {
                         this.out.println("Commande inconnue");
                     }
@@ -131,6 +136,12 @@ public class ClientHandler extends Thread {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             try {
