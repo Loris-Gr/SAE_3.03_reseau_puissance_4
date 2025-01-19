@@ -6,7 +6,7 @@ public class ExecutableBD {
         try {
             ConnexionMySQL connexion = new ConnexionMySQL();
 
-            connexion.connecter("servinfo-maria", "DBvergerolle", "vergerolle", "vergerolle");
+            connexion.connecter("localhost", "puissance4", "hun", "");
 
             if (connexion.isConnecte()) {
                 Puissance4BD bd = new Puissance4BD(connexion);

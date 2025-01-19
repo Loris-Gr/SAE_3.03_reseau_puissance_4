@@ -13,7 +13,7 @@ public class ClientHandler extends Thread {
     private Serveur serveur;
     private ClientHandler adversaire;  // Référence à l'adversaire qui reçoit la demande
     private boolean duelPropose;
-    private ModeleJeu modele;
+    private boolean enDuel;
 
     public ClientHandler(Socket socket, Serveur serveur) throws IOException {
         this.socket = socket;
@@ -22,6 +22,7 @@ public class ClientHandler extends Thread {
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.adversaire = null;
         this.duelPropose = false;
+        this.enDuel = false;
     }
 
     public String getPseudo() {
@@ -51,7 +52,17 @@ public class ClientHandler extends Thread {
         this.duelPropose = duelPropose;
     }
 
+    public BufferedReader getIn() {
+        return in;
+    }
 
+    public boolean getEnDuel() {
+        return enDuel;
+    }
+
+    public void setEnDuel(boolean enDuel) {
+        this.enDuel = enDuel;
+    }
     
 
     @Override
@@ -74,80 +85,86 @@ public class ClientHandler extends Thread {
         try {
             while (true) {
                 try {
-                    commande = this.in.readLine();  // Lire la commande du client
-                    if (commande == null || socket.isClosed()) {
-                        break;
-                    }
-
-                    System.out.println("Commande reçue de " + this.pseudo + ": " + commande);
-                    String[] messages = commande.split(" ");
-
-                    // Gérer la commande "bonjour"
-                    if (messages[0].equals("bonjour")) {
-                        this.out.println("Bonjour, " + this.getPseudo() + " !");
-                    }
-
-                    // Gérer la commande "connect"
-                    else if (commande.contains("co")) {
-                        try {
-                            this.setPseudo(messages[1]);
-                            this.out.println("Bienvenue, " + this.getPseudo() + " !");
-                        } catch (Exception e) {
-                            this.out.println("Pseudo incorrect");
+                    while (!enDuel) {
+                        commande = this.in.readLine();  // Lire la commande du client
+                        if (commande == null || socket.isClosed()) {
+                            break;
                         }
-                    }
 
-                    // Gérer la commande "ask"
-                    else if (messages[0].equals("ask") && messages.length == 2) {
-                        String adversairePseudo = messages[1];
-                        if (adversairePseudo.equals(this.getPseudo())) {
-                            this.out.println("Vous ne pouvez pas vous affronter vous-même.");
-                        } else {
-                            // Chercher l'adversaire parmi les clients connectés
-                            this.serveur.challegerJoueur(this, adversairePseudo);
+                        System.out.println("Commande reçue de " + this.pseudo + ": " + commande);
+                        String[] messages = commande.split(" ");
+
+                        // Gérer la commande "bonjour"
+                        if (messages[0].equals("bonjour")) {
+                            this.out.println("Bonjour, " + this.getPseudo() + " !");
                         }
-                    }
 
-                    // Gérer la réponse à l'adversaire
-                    else if (messages[0].equals("o") || messages[0].equals("n")) {
-                        if (this.duelPropose) {
-                            if (messages[0].equals("o")) {
-                                this.serveur.creerPartie(adversaire, this);
-                            }
-                            else {
-                                this.serveur.refuserPartie(adversaire, this);
+                        // Gérer la commande "connect"
+                        else if (commande.contains("co")) {
+                            try {
+                                this.setPseudo(messages[1]);
+                                this.out.println("Bienvenue, " + this.getPseudo() + " !");
+                            } catch (Exception e) {
+                                this.out.println("Pseudo incorrect");
                             }
                         }
+
+                        // Gérer la commande "ask"
+                        else if (messages[0].equals("ask") && messages.length == 2) {
+                            String adversairePseudo = messages[1];
+                            if (adversairePseudo.equals(this.getPseudo())) {
+                                this.out.println("Vous ne pouvez pas vous affronter vous-même.");
+                            } else {
+                                // Chercher l'adversaire parmi les clients connectés
+                                this.serveur.challegerJoueur(this, adversairePseudo);
+                            }
+                        }
+
+                        // Gérer la réponse à l'adversaire
+                        else if (messages[0].equals("o") || messages[0].equals("n")) {
+                            if (this.duelPropose) {
+                                if (messages[0].equals("o")) {
+                                    this.serveur.creerPartie(adversaire, this);
+                                }
+                                else {
+                                    this.serveur.refuserPartie(adversaire, this);
+                                    this.duelPropose = false;
+                                }
+                            }
+                        }
+
+                        // // Gérer la réponse de l'adversaire (oui/non)
+                        // else if (messages[0].equals("o") || messages[0].equals("n")) {
+                        //     if (this.adversaire != null) {
+                        //         // Répondre au défi de l'adversaire
+                        //         if (messages[0].equals("o")) {
+
+                        //             this.out.println("Vous avez accepté le défi !");
+                        //             this.adversaire.out.println("Le défi a été accepté");
+
+                        //             ModeleJeu modeleJeu = new ModeleJeu(Equipe.JAUNE);
+
+                        //             this.modele = modeleJeu;
+                        //             this.adversaire.modele = modeleJeu;
+
+                        //             this.adversaire.duelAccepte = true;
+                        //             this.duelAccepte = true;
+
+                        //         } else {
+                        //             this.out.println("Vous avez refusé le défi.");
+                        //             this.adversaire.out.println("Le défi a été refusé.");
+
+                        //             this.adversaire.setAdversaire(null);
+                        //             this.adversaire = null;
+                        //         }
+                        //     }
+                        // }
+                        else {
+                            this.out.println("Commande inconnue");
+                        }
                     }
-
-                    // // Gérer la réponse de l'adversaire (oui/non)
-                    // else if (messages[0].equals("o") || messages[0].equals("n")) {
-                    //     if (this.adversaire != null) {
-                    //         // Répondre au défi de l'adversaire
-                    //         if (messages[0].equals("o")) {
-
-                    //             this.out.println("Vous avez accepté le défi !");
-                    //             this.adversaire.out.println("Le défi a été accepté");
-
-                    //             ModeleJeu modeleJeu = new ModeleJeu(Equipe.JAUNE);
-
-                    //             this.modele = modeleJeu;
-                    //             this.adversaire.modele = modeleJeu;
-
-                    //             this.adversaire.duelAccepte = true;
-                    //             this.duelAccepte = true;
-
-                    //         } else {
-                    //             this.out.println("Vous avez refusé le défi.");
-                    //             this.adversaire.out.println("Le défi a été refusé.");
-
-                    //             this.adversaire.setAdversaire(null);
-                    //             this.adversaire = null;
-                    //         }
-                    //     }
-                    // }
                 } catch (Exception e) {
-                    this.out.println("Commande inconnue");
+                    continue;
                 }
                 
                 
@@ -184,20 +201,21 @@ public class ClientHandler extends Thread {
                 //         this.out.println("Le joueur " + modele.getJoueur() + " a gagné !");
                 //         this.adversaire.out.println("Le joueur " + modele.getJoueur() + " a gagné !");
 
-                //         try {
-                //             this.out.println("Enregistrement de la partie...");
-                //             partieBD.enregistrerPartie(modele.getJoueur().getId(), new java.sql.Date(System.currentTimeMillis()));
-                //             int score = partieBD.getScore(modele.getJoueur().getSymbole()) + 1;
-                //             partieBD.setScore(modele.getJoueur().getSymbole(), score);
+                        // try {
+                        //     System.out.println("Enregistrement de la partie...");
+                        //     partieBD.enregistrerPartie(modele.getJoueur().getId(), new java.sql.Date(System.currentTimeMillis()));
+                        //     int score = partieBD.getScore(modele.getJoueur().getSymbole()) + 1;
+                        //     partieBD.setScore(modele.getJoueur().getSymbole(), score);
                 
-                //             int scoreJoueur1 = partieBD.getScore(modele.getJoueur().getSymbole());    
-                //             int scoreJoueur2 = partieBD.getScore(modele.getJoueur().getSymbole());
-                //             System.out.println("Score du joueur " +  modele.getJoueur().getSymbole()+ " : " + scoreJoueur1);
-                //             System.out.println("Score du joueur " + modele.getJoueur().getSymbole()  + " : " + scoreJoueur2);
+                        //     int scoreJoueur1 = partieBD.getScore(modele.getJoueur().getSymbole());    
+                        //     int scoreJoueur2 = partieBD.getScore(modele.getJoueur().getSymbole());
+                        //     System.out.println("Score du joueur " +  modele.getJoueur().getSymbole()+ " : " + scoreJoueur1);
+                        //     System.out.println("Score du joueur " + modele.getJoueur().getSymbole()  + " : " + scoreJoueur2);
                             
-                //         } catch (java.sql.SQLException e) {
-                //             e.printStackTrace();
-                //         }
+                        //     System.out.println("Partie enregistrée");
+                        // } catch (java.sql.SQLException e) {
+                        //     e.printStackTrace();
+                        // }
                 
 
                 //         this.adversaire.modele = null;

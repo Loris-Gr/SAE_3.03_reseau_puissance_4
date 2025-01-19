@@ -3,17 +3,20 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import bd.ConnexionMySQL;
+import bd.PartieBD;
+
 public class Serveur extends Thread {
     private static final int PORT = 12345;
     private ServerSocket serverSocket;
     private int port;
     private List<ClientHandler> clientHandlers;
-    private List<PartieEnCours> partieEnCours;
+    private List<PartieEnCours> lesPartiesEnCours;
 
     public Serveur(int port) {
         this.port = port;
         this.clientHandlers = new ArrayList<>();
-        this.partieEnCours = new ArrayList<>();
+        this.lesPartiesEnCours = new ArrayList<>();
     }
 
     public ClientHandler trouverJoueur(String pseudo) {
@@ -43,13 +46,52 @@ public class Serveur extends Thread {
     }
 
     public void creerPartie(ClientHandler joueur1, ClientHandler joueur2) {
+        PartieEnCours partie = new PartieEnCours(joueur1, joueur2, this);
         joueur1.getOut().println("Partie Créée");
         joueur2.getOut().println("Partie Créée");
+
+        this.lesPartiesEnCours.add(partie);
+
+        joueur1.setEnDuel(true);
+        joueur2.setEnDuel(true);
+
+        partie.start();
     }
 
     public void refuserPartie(ClientHandler joueur1, ClientHandler joueur2) {
-        joueur1.getOut().println("Duel Créée");
+        joueur1.getOut().println("Duel Refusée");
         joueur2.getOut().println("Duel Refusée");
+    }
+
+    public void finirPartie(PartieEnCours partieEnCours) throws ClassNotFoundException {
+        partieEnCours.getJoueur1().setEnDuel(false);
+        partieEnCours.getJoueur2().setEnDuel(false);
+
+        ModeleJeu modele = partieEnCours.getModele();
+
+        try {
+            ConnexionMySQL connexion = null;
+            connexion = new ConnexionMySQL();
+            connexion.connecter("localhost", "puissance4", "hun", "");
+            PartieBD partieBD = new PartieBD(connexion);
+            System.out.println("Enregistrement de la partie...");
+            
+            partieBD.enregistrerPartie(modele.getJoueur().getId(), new java.sql.Date(System.currentTimeMillis()));
+            int score = partieBD.getScore(modele.getJoueur().getSymbole()) + 1;
+            partieBD.setScore(modele.getJoueur().getSymbole(), score);
+
+            int scoreJoueur1 = partieBD.getScore(modele.getJoueur().getSymbole());    
+            int scoreJoueur2 = partieBD.getScore(modele.getJoueur().getSymbole());
+            System.out.println("Score du joueur " +  modele.getJoueur().getSymbole()+ " : " + scoreJoueur1);
+            System.out.println("Score du joueur " + modele.getJoueur().getSymbole()  + " : " + scoreJoueur2);
+            
+            System.out.println("Partie enregistrée");
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+
+        partieEnCours.interrupt();
+        this.lesPartiesEnCours.remove(partieEnCours);
     }
 
     public void run() {
