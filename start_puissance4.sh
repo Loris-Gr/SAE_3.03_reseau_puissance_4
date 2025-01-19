@@ -1,0 +1,2 @@
+javac --module-path /usr/share/openjfx/lib/ --add-modules javafx.controls -d Puissance4_graphic/bin/ Puissance4_graphic/src/*.java
+java --module-path /usr/share/openjfx/lib/ --add-modules javafx.controls,javafx.fxml -cp Puissance4_graphic/bin/ src.AppliJeu

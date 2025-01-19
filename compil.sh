@@ -1,0 +1,1 @@
+javac -d Puissance4/bin/ Puissance4/bd/*.java Puissance4/*.java
